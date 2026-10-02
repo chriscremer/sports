@@ -29,7 +29,7 @@
     "team_1": "Two bit Tuesday Terriers",
     "team_2": "Dream Team"
   },
-  "show_player_numbers": true,
+  "show_player_numbers": false,
   "players": [
     {
       "id": "id_3f72066513",
