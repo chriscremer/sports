@@ -1,0 +1,190 @@
+{
+  "title": "CTS SEP08 Barney & Friends Vs Dream Team",
+  "overlay_path": "/Users/chriscremer/Downloads/soccer_video_analysis_storage/processed_matches/CTS_SEP08_Barney_&_Friends_Vs_Dream_Team_run/development/overlay.json",
+  "eyebrow": "Match timeline",
+  "video_id": "T4_94fyPL2c",
+  "video_duration_seconds": 3867.0,
+  "tracked_interval_seconds": [
+    579.0,
+    3769.0
+  ],
+  "tracked_periods": [
+    {
+      "label": "First half",
+      "start": 579.0,
+      "end": 2062.0
+    },
+    {
+      "label": "Second half",
+      "start": 2274.0,
+      "end": 3769.0
+    }
+  ],
+  "confirmed_identities": 22,
+  "team_order": [
+    "team_1",
+    "team_2"
+  ],
+  "team_names": {
+    "team_1": "Barney & Friends",
+    "team_2": "Dream Team"
+  },
+  "show_player_numbers": true,
+  "players": [
+    {
+      "id": "id_4d9bb6f040",
+      "label": "P1",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_61cf7cda6d",
+      "label": "P2",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_7553a95930",
+      "label": "P3",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_cea7b9eb6d",
+      "label": "P4",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_dec1cafa7c",
+      "label": "P5",
+      "role": "referee",
+      "team": null,
+      "visible": false
+    },
+    {
+      "id": "id_ffbaf9efdc",
+      "label": "P6",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_573ed6032a",
+      "label": "P7",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_06bb49a07d",
+      "label": "P8",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_dde3104cbc",
+      "label": "P9",
+      "role": "goalkeeper",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_5c58e327e3",
+      "label": "P10",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_b8807e403b",
+      "label": "P11",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_84a32fb310",
+      "label": "P12",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_2292b9573f",
+      "label": "P13",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_dd96d195da",
+      "label": "P14",
+      "role": "goalkeeper",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_0525d3d9be",
+      "label": "P15",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_286d569f44",
+      "label": "P16",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_4ebc1d2005",
+      "label": "P17",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_ccbbfb9beb",
+      "label": "P18",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_2198a59ff1",
+      "label": "P19",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_051f995471",
+      "label": "P20",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_2b37ef1398",
+      "label": "P21",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_270797f93b",
+      "label": "P22",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    }
+  ],
+  "video_title": "CTS SEP08 Barney & Friends Vs Dream Team"
+}

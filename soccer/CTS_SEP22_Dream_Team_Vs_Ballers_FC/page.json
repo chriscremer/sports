@@ -1,0 +1,197 @@
+{
+  "title": "CTS SEP22 Dream Team Vs Ballers FC",
+  "video_title": "CTS SEP22 Dream Team Vs Ballers FC",
+  "overlay_path": "/Users/chriscremer/Downloads/soccer_video_analysis_storage/processed_matches/CTS_SEP22_Dream_Team_Vs_Ballers_FC_run/development/overlay.json",
+  "eyebrow": "Match timeline",
+  "video_id": "tv52_EYY2YE",
+  "video_duration_seconds": 3718.0,
+  "tracked_interval_seconds": [
+    459.0,
+    3558.0
+  ],
+  "tracked_periods": [
+    {
+      "label": "First half",
+      "start": 459.0,
+      "end": 1889.0
+    },
+    {
+      "label": "Second half",
+      "start": 2088.0,
+      "end": 3558.0
+    }
+  ],
+  "confirmed_identities": 23,
+  "team_order": [
+    "team_2",
+    "team_1"
+  ],
+  "team_names": {
+    "team_1": "Ballers FC",
+    "team_2": "Dream Team"
+  },
+  "show_player_numbers": false,
+  "players": [
+    {
+      "id": "id_100ed8f204",
+      "label": "P1",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_4db730b633",
+      "label": "P2",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_5003103c94",
+      "label": "P3",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_9029185dae",
+      "label": "P4",
+      "role": "player",
+      "team": "team_2",
+      "visible": false
+    },
+    {
+      "id": "id_947f5a978c",
+      "label": "P5",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_a10ce61ffe",
+      "label": "P6",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_e2d673d503",
+      "label": "P7",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_ea196bbb4a",
+      "label": "P8",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_d5596832aa",
+      "label": "P9",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_f1ee4595b5",
+      "label": "P10",
+      "role": "goalkeeper",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_d7dc3abdb5",
+      "label": "P11",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_4125668012",
+      "label": "P12",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_e53f786899",
+      "label": "P13",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_cc055ed69d",
+      "label": "P14",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_gap_ed629251cc",
+      "label": "P15",
+      "role": "other",
+      "team": null,
+      "visible": false
+    },
+    {
+      "id": "id_9f2a76a967",
+      "label": "P16",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_70848eb2ed",
+      "label": "P17",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_a8be1fdb73",
+      "label": "P18",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_07e2fbf416",
+      "label": "P19",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_9bf4de11aa",
+      "label": "P20",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_1fdcb0c142",
+      "label": "P21",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_3a8e06ea89",
+      "label": "P22",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_60ae21a732",
+      "label": "P23",
+      "role": "player",
+      "team": "team_2",
+      "visible": false
+    }
+  ]
+}

@@ -16,7 +16,7 @@
     }
     main { max-width: 860px; margin: 0 auto; padding: 100px 24px; }
     h1 { margin: 0 0 40px; font-size: clamp(40px, 8vw, 64px); letter-spacing: -.05em; }
-    nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    nav { display: grid; grid-template-columns: 1fr; gap: 16px; }
     a {
       display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 20px;
       min-height: 132px; padding: 28px;
@@ -28,6 +28,8 @@
     a:focus-visible { outline: 3px solid #87c9ad; outline-offset: 4px; }
     .sport-image { grid-column: 1 / -1; width: 100%; height: 150px; padding: 10px; background: #10171b; border-radius: 10px; object-fit: contain; }
     .name { display: block; font-size: 21px; font-weight: 600; letter-spacing: -.02em; }
+    .dream-team { color: #f48fbe; }
+    .date { display: block; margin-bottom: 10px; color: #a9b7bf; font-size: 14px; }
     .arrow { color: #87c9ad; font-size: 25px; }
     @media (max-width: 560px) {
       main { padding-top: 56px; }
@@ -43,10 +45,9 @@
     <a class="back" href="../index.html">← Sports</a>
     <h1>Soccer</h1>
     <nav aria-label="Soccer games">
-      <a href="game_20260915_test_v2/index.html"><span class="name">09/15/2026 · Version 2</span><span class="arrow" aria-hidden="true">→</span></a>
-      <a href="game_20260915_test_v1/index.html"><span class="name">09/15/2026 · Version 1</span><span class="arrow" aria-hidden="true">→</span></a>
-      <a href="game_20260908_test_v3/index.html"><span class="name">09/08/2026 · Version 3</span><span class="arrow" aria-hidden="true">→</span></a>
-      <a href="game_20260908_test_v2/index.html"><span class="name">09/08/2026 · Version 2</span><span class="arrow" aria-hidden="true">→</span></a>
+      <a href="CTS_SEP22_Dream_Team_Vs_Ballers_FC/index.html"><span><span class="date">09/22/2026</span><span class="name"><span class="dream-team">Dream Team</span> vs Ballers FC</span></span><span class="arrow" aria-hidden="true">→</span></a>
+      <a href="CTS_SEP15_Dream_Team_Vs_Two_bit_Tuesday_Terriers/index.html"><span><span class="date">09/15/2026</span><span class="name"><span class="dream-team">Dream Team</span> vs Two bit Tuesday Terriers</span></span><span class="arrow" aria-hidden="true">→</span></a>
+      <a href="CTS_SEP08_Barney_%26_Friends_Vs_Dream_Team/index.html"><span><span class="date">09/08/2026</span><span class="name">Barney &amp; Friends vs <span class="dream-team">Dream Team</span></span></span><span class="arrow" aria-hidden="true">→</span></a>
     </nav>
   </main>
 </body>

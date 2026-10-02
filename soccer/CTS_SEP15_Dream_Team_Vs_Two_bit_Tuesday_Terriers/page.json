@@ -1,0 +1,197 @@
+{
+  "title": "CTS SEP15 Dream Team Vs Two bit Tuesday Terriers",
+  "overlay_path": "/Users/chriscremer/Downloads/soccer_video_analysis_storage/processed_matches/CTS_SEP15_Dream_Team_Vs_Two_bit_Tuesday_Terriers_run/development/overlay.json",
+  "eyebrow": "Match timeline",
+  "video_id": "7JQ2NSer4wM",
+  "video_duration_seconds": 3308.0,
+  "tracked_interval_seconds": [
+    233.0,
+    3285.0
+  ],
+  "tracked_periods": [
+    {
+      "label": "First half",
+      "start": 233.0,
+      "end": 1653.0
+    },
+    {
+      "label": "Second half",
+      "start": 1780.0,
+      "end": 3285.0
+    }
+  ],
+  "confirmed_identities": 23,
+  "team_order": [
+    "team_2",
+    "team_1"
+  ],
+  "team_names": {
+    "team_1": "Two bit Tuesday Terriers",
+    "team_2": "Dream Team"
+  },
+  "show_player_numbers": true,
+  "players": [
+    {
+      "id": "id_3f72066513",
+      "label": "P1",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_7ddc31fbc4",
+      "label": "P2",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_809cb3f092",
+      "label": "P3",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_b527210441",
+      "label": "P4",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_cbef971266",
+      "label": "P5",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_910f95d228",
+      "label": "P6",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_5dc10bde6a",
+      "label": "P7",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_a55d1dc79d",
+      "label": "P8",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_a3b957892f",
+      "label": "P9",
+      "role": "goalkeeper",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_94e41ddf2d",
+      "label": "P10",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_f7d572cddf",
+      "label": "P11",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_15a5206c4d",
+      "label": "P12",
+      "role": "goalkeeper",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_6f6468f639",
+      "label": "P13",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_0f45125064",
+      "label": "P14",
+      "role": "referee",
+      "team": null,
+      "visible": false
+    },
+    {
+      "id": "id_6e171e1e7b",
+      "label": "P15",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_5a0a80be3e",
+      "label": "P16",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_209dad9270",
+      "label": "P17",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_9dd462edf8",
+      "label": "P18",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_fd12d4d3be",
+      "label": "P19",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_afe6816e48",
+      "label": "P20",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_adb2d3e007",
+      "label": "P21",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_gap_7ae7878ebf",
+      "label": "P22",
+      "role": "player",
+      "team": "team_1",
+      "visible": true
+    },
+    {
+      "id": "id_d66c902335",
+      "label": "P23",
+      "role": "player",
+      "team": "team_1",
+      "visible": false
+    }
+  ],
+  "video_title": "CTS SEP15 Dream Team Vs Two bit Tuesday Terriers"
+}
