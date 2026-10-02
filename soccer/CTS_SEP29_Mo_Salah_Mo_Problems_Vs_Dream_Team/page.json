@@ -1,24 +1,24 @@
 {
-  "title": "CTS SEP22 Dream Team Vs Ballers FC",
-  "video_title": "CTS SEP22 Dream Team Vs Ballers FC",
-  "overlay_path": "/Users/chriscremer/Downloads/soccer_video_analysis_storage/processed_matches/CTS_SEP22_Dream_Team_Vs_Ballers_FC_run/development/overlay.json",
+  "title": "CTS SEP29 Mo Salah Mo Problems Vs Dream Team",
+  "video_title": "CTS SEP29 Mo Salah Mo Problems Vs Dream Team",
+  "overlay_path": "/Users/chriscremer/Downloads/soccer_video_analysis_storage/processed_matches/CTS_SEP29_Mo_Salah_Mo_Problems_Vs_Dream_Team_run/development/overlay.json",
   "eyebrow": "Match timeline",
-  "video_id": "tv52_EYY2YE",
-  "video_duration_seconds": 3718.0,
+  "video_id": "qxf4LThGoXI",
+  "video_duration_seconds": 3590.0,
   "tracked_interval_seconds": [
-    459.0,
-    3558.0
+    483.0,
+    3534.0
   ],
   "tracked_periods": [
     {
       "label": "First half",
-      "start": 459.0,
-      "end": 1889.0
+      "start": 483.0,
+      "end": 1895.0
     },
     {
       "label": "Second half",
-      "start": 2088.0,
-      "end": 3558.0
+      "start": 2028.0,
+      "end": 3534.0
     }
   ],
   "confirmed_identities": 23,
@@ -27,171 +27,171 @@
     "team_1"
   ],
   "team_names": {
-    "team_1": "Ballers FC",
+    "team_1": "Mo Salah Mo Problems",
     "team_2": "Dream Team"
   },
   "show_player_numbers": false,
   "players": [
     {
-      "id": "id_100ed8f204",
+      "id": "id_0b48a3c559",
       "label": "P1",
+      "role": "referee",
+      "team": null,
+      "visible": false
+    },
+    {
+      "id": "id_227b3966f6",
+      "label": "P2",
       "role": "player",
       "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_4db730b633",
-      "label": "P2",
-      "role": "player",
-      "team": "team_2",
-      "visible": true
-    },
-    {
-      "id": "id_5003103c94",
+      "id": "id_271a819a16",
       "label": "P3",
       "role": "player",
       "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_9029185dae",
+      "id": "id_63279f1edb",
       "label": "P4",
       "role": "player",
       "team": "team_2",
-      "visible": false
+      "visible": true
     },
     {
-      "id": "id_947f5a978c",
+      "id": "id_bc05458e7e",
       "label": "P5",
+      "role": "player",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_e1ede58322",
+      "label": "P6",
       "role": "player",
       "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_a10ce61ffe",
-      "label": "P6",
-      "role": "player",
-      "team": "team_2",
-      "visible": true
-    },
-    {
-      "id": "id_e2d673d503",
+      "id": "id_36a04afc92",
       "label": "P7",
       "role": "player",
-      "team": "team_2",
+      "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_ea196bbb4a",
+      "id": "id_f740f0ac95",
       "label": "P8",
       "role": "player",
       "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_d5596832aa",
+      "id": "id_3aa2d31a1c",
       "label": "P9",
-      "role": "player",
-      "team": "team_1",
-      "visible": true
-    },
-    {
-      "id": "id_f1ee4595b5",
-      "label": "P10",
       "role": "goalkeeper",
       "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_d7dc3abdb5",
-      "label": "P11",
+      "id": "id_46cc0b8a0d",
+      "label": "P10",
       "role": "player",
-      "team": "team_2",
+      "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_4125668012",
+      "id": "id_6a74782ad7__independent_remnant04",
+      "label": "P11",
+      "role": "player",
+      "team": "team_1",
+      "visible": false
+    },
+    {
+      "id": "id_e3f1b383cf",
       "label": "P12",
       "role": "player",
       "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_e53f786899",
+      "id": "id_5da5fdcaa7",
       "label": "P13",
       "role": "player",
       "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_cc055ed69d",
+      "id": "id_acf5e9c108",
       "label": "P14",
       "role": "player",
-      "team": "team_1",
+      "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_gap_ed629251cc",
+      "id": "id_gap_8fa66c88ac",
       "label": "P15",
-      "role": "other",
-      "team": null,
-      "visible": false
-    },
-    {
-      "id": "id_9f2a76a967",
-      "label": "P16",
       "role": "player",
-      "team": "team_1",
-      "visible": false
+      "team": "team_2",
+      "visible": true
     },
     {
-      "id": "id_70848eb2ed",
+      "id": "id_f307fef06e",
+      "label": "P16",
+      "role": "goalkeeper",
+      "team": "team_2",
+      "visible": true
+    },
+    {
+      "id": "id_180c7d668b",
       "label": "P17",
       "role": "player",
       "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_a8be1fdb73",
+      "id": "id_6bba77dc5c",
       "label": "P18",
       "role": "player",
-      "team": "team_2",
+      "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_07e2fbf416",
+      "id": "id_6cecdf09c6",
       "label": "P19",
       "role": "player",
       "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_9bf4de11aa",
+      "id": "id_d0fd2fc4a8",
       "label": "P20",
       "role": "player",
       "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_1fdcb0c142",
+      "id": "id_1c56fa3164",
       "label": "P21",
       "role": "player",
       "team": "team_2",
       "visible": true
     },
     {
-      "id": "id_3a8e06ea89",
+      "id": "id_0d230c1b7b",
       "label": "P22",
       "role": "player",
       "team": "team_1",
       "visible": true
     },
     {
-      "id": "id_60ae21a732",
+      "id": "id_2ae0649ebd",
       "label": "P23",
       "role": "player",
       "team": "team_2",
-      "visible": false
+      "visible": true
     }
   ]
 }
