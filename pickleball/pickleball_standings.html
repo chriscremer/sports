@@ -78,7 +78,7 @@
 <body>
 <main class="wrap">
   <header><div><p class="eyebrow">Fall 2026 · Monday tiered pairs</p><h1>Pickleball</h1>
-    <p class="subtitle">Updated Oct 4, 2026 at 7:12 PM EDT.</p></div>
+    <p class="subtitle">Updated Oct 4, 2026 at 7:18 PM EDT.</p></div>
     <a class="source" href="https://offlimitsports.leagueapps.com/leagues/5080557/schedule" target="_blank" rel="noopener">LeagueApps schedule ↗</a></header>
   <div class="tabs" role="tablist" aria-label="Dashboard views">
     <button class="tab" id="tab-elo" role="tab" aria-controls="elo" aria-selected="true">Elo ratings</button>
@@ -276,9 +276,18 @@
 </main>
 <script>
   const tabs = [...document.querySelectorAll('[aria-label="Dashboard views"] [role="tab"]')];
-  function selectTab(tab) {
+  history.scrollRestoration = 'manual';
+  function currentView() {
+    return {
+      dashboardTab: tabs.find(tab => tab.getAttribute('aria-selected') === 'true').id,
+      resultsTab: resultTabs.find(tab => tab.getAttribute('aria-selected') === 'true').id,
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    };
+  }
+  function selectTab(tab, updateHistory = true) {
     tabs.forEach(item => { const active = item === tab; item.setAttribute('aria-selected', active); document.getElementById(item.getAttribute('aria-controls')).hidden = !active; });
-    history.replaceState(null, '', '#' + tab.getAttribute('aria-controls'));
+    if (updateHistory) history.replaceState(currentView(), '', '#' + tab.getAttribute('aria-controls'));
   }
   tabs.forEach((tab, index) => {
     tab.addEventListener('click', () => selectTab(tab));
@@ -290,12 +299,13 @@
     });
   });
   const resultTabs = [...document.querySelectorAll('[aria-label="Results views"] [role="tab"]')];
-  function selectResultTab(tab) {
+  function selectResultTab(tab, updateHistory = true) {
     resultTabs.forEach(item => {
       const active = item === tab;
       item.setAttribute('aria-selected', active);
       document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
     });
+    if (updateHistory) history.replaceState(currentView(), '', '#results');
   }
   resultTabs.forEach((tab, index) => {
     tab.addEventListener('click', () => selectResultTab(tab));
@@ -309,9 +319,8 @@
   function openTeam(hash, focus = false) {
     const card = document.getElementById(hash.slice(1));
     if (!card || !card.matches('.team-results .card')) return false;
-    selectTab(document.getElementById('tab-results'));
-    selectResultTab(document.getElementById('tab-per-team'));
-    history.replaceState(null, '', hash);
+    selectTab(document.getElementById('tab-results'), false);
+    selectResultTab(document.getElementById('tab-per-team'), false);
     const heading = card.querySelector('h2');
     if (focus) {
       heading.tabIndex = -1;
@@ -323,16 +332,43 @@
   document.addEventListener('click', event => {
     const link = event.target.closest('a.team-link');
     if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    if (openTeam(link.getAttribute('href'), true)) event.preventDefault();
+    const hash = link.getAttribute('href');
+    const card = document.getElementById(hash.slice(1));
+    if (!card || !card.matches('.team-results .card')) return;
+    event.preventDefault();
+    if (location.hash !== hash) {
+      history.replaceState(currentView(), '');
+      history.pushState(null, '', hash);
+    }
+    openTeam(hash, true);
+    history.replaceState(currentView(), '');
   });
   function openHash() {
     const linkedHash = location.hash === '#hamr' ? '#schedule' : location.hash;
     if (openTeam(linkedHash)) return;
     const linkedTab = tabs.find(tab => '#' + tab.getAttribute('aria-controls') === linkedHash);
-    if (linkedTab) selectTab(linkedTab);
+    selectTab(linkedTab || document.getElementById('tab-elo'), false);
   }
-  window.addEventListener('hashchange', openHash);
-  openHash();
+  function restoreView() {
+    const state = history.state;
+    const tab = state && tabs.find(tab => tab.id === state.dashboardTab);
+    const resultTab = state && resultTabs.find(tab => tab.id === state.resultsTab);
+    if (!tab || !resultTab) {
+      openHash();
+      return;
+    }
+    selectTab(tab, false);
+    selectResultTab(resultTab, false);
+    requestAnimationFrame(() => window.scrollTo(state.scrollX, state.scrollY));
+  }
+  window.addEventListener('popstate', restoreView);
+  window.addEventListener('hashchange', restoreView);
+  if (history.state && history.state.dashboardTab) {
+    restoreView();
+  } else {
+    openHash();
+    history.replaceState(currentView(), '');
+  }
 </script>
 </body>
 </html>
