@@ -1,5 +1,6 @@
 """Export the current viewer and analyzed clips for GitHub Pages (no backend)."""
 import argparse
+import hashlib
 import json
 import shutil
 from pathlib import Path
@@ -14,10 +15,12 @@ def build(data: Path, output: Path):
     output.mkdir(parents=True, exist_ok=True)
     web = PROJECT / 'web'
     html = (web / 'index.html').read_text()
-    html = html.replace('href="/style.css"', 'href="./style.css"')
+    css_version = hashlib.sha256((web / 'style.css').read_bytes()).hexdigest()[:12]
+    js_version = hashlib.sha256((web / 'app.js').read_bytes()).hexdigest()[:12]
+    html = html.replace('href="/style.css"', f'href="./style.css?v={css_version}"')
     html = html.replace('"three":"/vendor/three.module.js"', '"three":"./vendor/three.module.js"')
     html = html.replace('href="/"', 'href="./index.html"')
-    html = html.replace('src="/app.js"', 'src="./app.js"')
+    html = html.replace('src="/app.js"', f'src="./app.js?v={js_version}"')
     html = html.replace('<body>', '<body data-clips-url="./clips.json" data-media-base="./media/">')
     (output / 'index.html').write_text(html)
     for name in ('app.js', 'style.css'):
