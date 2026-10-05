@@ -5,3 +5,5 @@
 
 /* Keep the media clock/decoder alive; present its pixels on the overlay canvas. */
 .video-stage video{opacity:0;pointer-events:none}.video-stage:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;background:#000}.video-stage:fullscreen #overlay{object-fit:contain}.media-buttons{display:flex;gap:4px}.media-buttons button{padding:5px 7px;font-size:10px}
+
+main>.transport{margin:0 0 16px}
