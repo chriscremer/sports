@@ -1,0 +1,7 @@
+Upstream: https://github.com/qaz812345/TrackNetV3
+Files: model.py, LICENSE (unmodified from master, retrieved 2026-10-05)
+Checkpoint: official README Google Drive link, file ID 1CfzE87a0f6LhBp0kniSl1-89zaLCZ8cA
+Code and official pretrained checkpoints licensed MIT by upstream.
+Checkpoint trained for badminton shuttlecock detection, not pickleball.
+No InpaintNet estimates are mixed into the comparison detector output.
+Upstream commit: 6eda442ada1740573f200f836d93edc9a541ee86

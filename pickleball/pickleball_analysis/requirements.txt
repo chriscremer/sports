@@ -1,0 +1,7 @@
+ultralytics==8.4.155
+torch>=2.7
+torchvision>=0.22
+numpy>=2.4.1,<2.5
+opencv-python>=4.11
+scipy>=1.14
+yt-dlp[default]>=2026.8.19
