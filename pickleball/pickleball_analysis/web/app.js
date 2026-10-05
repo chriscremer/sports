@@ -108,6 +108,5 @@ $('play').onclick=()=>video.paused?video.play().catch(e=>{$('notice').textConten
 for(const [id,d] of [['back',-1],['next',1]])$(id).onclick=()=>{video.pause();video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+d/data.clip.hz));update(true)};
 for(const id of ['show-pose','show-ball','trails'])$(id).onchange=()=>update(true);
 for(const [id,pos] of [['perspective',[10,9,18]],['top',[3.048,21,6.71]],['side',[21,5,6.7]]])$(id).onclick=()=>{camera.position.set(...pos);controls.target.set(3.048,0,6.7);controls.update();for(const n of ['perspective','top','side'])$(n).classList.toggle('active',id===n)};
-$('clips').onchange=e=>loadClip(+e.target.value).catch(showError);
 function showError(e){$('notice').textContent=e.message;$('notice').classList.add('warning')}
-try{clips=await fetch(clipsURL).then(r=>{if(!r.ok)throw Error('Clip list unavailable');return r.json()});if(!clips.length)throw Error('No analyzed excerpts yet. Run analyze.py to generate real pose data.');$('clips').innerHTML=clips.map((c,i)=>`<option value="${i}">${fmt(c.start)}–${fmt(c.end)} · ${(c.end-c.start).toFixed(0)}s rally</option>`).join('');await loadClip(0)}catch(e){showError(e)}
+try{clips=await fetch(clipsURL).then(r=>{if(!r.ok)throw Error('Clip list unavailable');return r.json()});clips=clips.filter(c=>c.start===55);if(!clips.length)throw Error('The 10-second rally is unavailable.');await loadClip(0)}catch(e){showError(e)}

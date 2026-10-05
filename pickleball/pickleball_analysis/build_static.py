@@ -29,7 +29,7 @@ def build(data: Path, output: Path):
                     ignore=shutil.ignore_patterns('.DS_Store'))
 
     clips = []
-    for source in sorted((data / 'analysis').glob('rally-*.json')):
+    for source in [data / 'analysis' / 'rally-55.json']:
         analysis = json.loads(source.read_text())
         clip = dict(analysis['clip'])
         video_path = clip['video'].removeprefix('/media/')

@@ -11,7 +11,7 @@ cd /Users/chriscremer/code/sports/pickleball/pickleball_analysis
 
 Open http://127.0.0.1:8765. Use `./start.sh --port 8766` if the default port is occupied. No Node/build step is required; Three.js and OrbitControls are vendored locally. Fonts have system fallbacks. The local HTTP server supports byte ranges for seeking. It binds to loopback only.
 
-Two real excerpts are analyzed at 15 Hz: **00:55–01:05.4** and **01:15–01:18.4**. The viewer offers these two analyzed excerpts. All views use the HTML video clock. The source footage and detections are drawn together on a canvas to avoid disappearing video presentation layers in the embedded browser; the controls below the footage handle playback, mute, and fullscreen. Player colours indicate court side, not named individuals.
+The viewer plays the **00:55–01:05.4** rally, analyzed at 15 Hz. A second analyzed excerpt (**01:15–01:18.4**) remains in the local research data but is not offered on this page. All views use the HTML video clock. The source footage and detections are drawn together on a canvas to avoid disappearing video presentation layers in the embedded browser; the controls below the footage handle playback, mute, and fullscreen. Player colours indicate court side, not named individuals.
 
 The page includes pose and learned ball overlays, frame stepping, playback speed, looping, scrubbing, orbit/zoom, three camera presets, and movement trails. A first estimated 3D ball trajectory covers 00:56.523–00:59.720 in the opening excerpt. Later exchanges and the second excerpt have 2D detections where supported; they do not have reliable reconstructed height yet.
 
@@ -20,7 +20,7 @@ The page includes pose and learned ball overlays, frame stepping, playback speed
 The published page is https://chriscremer.ca/sports/pickleball/pickleball_analysis/index.html.
 The files at this directory's root (`index.html`, `app.js`, `style.css`, `clips.json`,
 `vendor/`, and `media/`) form a static export; no Python server runs on the website.
-Both analyzed excerpts and their tracking data are included. The Full match button and export controls have been removed; the header links to the original video on YouTube.
+The 10-second rally and its tracking data are included; there is no clip dropdown. The Full match button and export controls have been removed; the header links to the original video on YouTube.
 
 After editing `web/` or regenerating analysis, rebuild the public files:
 
@@ -30,7 +30,7 @@ python3 build_static.py
 
 The export uses relative URLs so the page works within `/sports/pickleball/pickleball_analysis/`.
 Downloaded sources and model weights stay in the original Downloads data directory;
-only the two excerpt videos and their analysis are copied into the public export.
+only the opening excerpt video and its analysis are copied into the public export.
 Publishing uses the `main` branch of `chriscremer/sports` and its existing GitHub Pages setup.
 
 ## Analysis
