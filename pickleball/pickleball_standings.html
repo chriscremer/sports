@@ -22,6 +22,13 @@
   .panel[hidden] { display:none; }
   .card { background:#1c2821; border:1px solid var(--line); border-radius:17px; overflow:hidden; box-shadow:0 7px 30px #00000026; }
   .schedule-stack { display:grid; gap:20px; }
+  .wrap:has(#schedule:not([hidden])) { max-width:1680px; }
+  #schedule .schedule-stack { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+  #schedule .card { min-width:0; }
+  #schedule table { white-space:normal; font-size:13px; }
+  #schedule th, #schedule td { padding:10px; }
+  #schedule .date, #schedule .scores { white-space:nowrap; }
+  @media(max-width:1000px) { #schedule .schedule-stack { grid-template-columns:1fr; } #schedule .alignment-placeholder { display:none; } }
   .panelhead { display:flex; justify-content:space-between; align-items:start; gap:16px; padding:20px 22px 14px; }
   h2 { font-size:20px; margin:0 0 3px; letter-spacing:-.025em; }
   .note { color:var(--muted); margin:0; font-size:13px; }
@@ -80,7 +87,7 @@
 <body>
 <main class="wrap">
   <header><div><p class="eyebrow">Fall 2026 · Monday tiered pairs</p><h1>Pickleball</h1>
-    <p class="subtitle">Updated Oct 20, 2026 at 2:42 PM EDT.</p></div>
+    <p class="subtitle">Updated Oct 21, 2026 at 12:21 PM EDT.</p></div>
     <a class="source" href="https://offlimitsports.leagueapps.com/leagues/5080557/schedule" target="_blank" rel="noopener">LeagueApps schedule ↗</a></header>
   <div class="tabs" role="tablist" aria-label="Dashboard views">
     <button class="tab" id="tab-elo" role="tab" aria-controls="elo" aria-selected="true">Elo ratings</button>
@@ -147,42 +154,41 @@
       </tbody></table></div></div>
   </section>
   <section class="panel" id="schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden>
-    <p class="note" style="margin:0 0 14px">Times shown in Toronto. Played fixtures show Elo before the fixture; upcoming fixtures show current Elo.</p>
     <div class="schedule-stack team-schedules"><div class="card" id="team-hamr-time"><div class="panelhead"><div><h2>Hamr Time</h2>
       <p class="note">Games at the same time against the same opponent are grouped as one fixture. Completed fixtures show starting Elo and the combined change from those games.</p></div></div>
       <div class="scroll"><table><thead><tr><th scope="col" style="text-align:left">Date &amp; time</th><th scope="col">Opponent</th><th scope="col">Location</th><th scope="col">Scores</th><th scope="col">Status</th></tr></thead><tbody>
-      <tr class="day-2 day-start"><td class="date"><strong>Mon, Sep 21</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-s2">S2</a><span class="opponent-elo">Elo 1500 vs ours: 1500 <span class="elo-change gain">(+31)</span></span></th><td>Senhor Santo Cristo C.S. · Court 3</td><td class="scores">8–1, 8–1</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-2"><td class="date"><strong>Mon, Sep 21</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a><span class="opponent-elo">Elo 1469 vs ours: 1531 <span class="elo-change gain">(+25)</span></span></th><td>Senhor Santo Cristo C.S. · Court 3</td><td class="scores">8–2, 8–2</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-3 day-start"><td class="date"><strong>Mon, Sep 28</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a><span class="opponent-elo">Elo 1500 vs ours: 1556 <span class="elo-change gain">(+26)</span></span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">15–1, 11–1</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-3"><td class="date"><strong>Mon, Sep 28</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-dixon-cider">Dixon Cider</a><span class="opponent-elo">Elo 1563 vs ours: 1582 <span class="elo-change gain">(+29)</span></span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">8–7, 13–4</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-4 day-start"><td class="date"><strong>Mon, Oct 5</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-racketeers">racketeers</a><span class="opponent-elo">Elo 1549 vs ours: 1610 <span class="elo-change loss">(-36)</span></span></th><td>Oakwood Collegiate · Court 1</td><td class="scores"><span class="score-loss">5–12</span>, <span class="score-loss">8–12</span></td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-4"><td class="date"><strong>Mon, Oct 5</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a><span class="opponent-elo">Elo 1522 vs ours: 1575 <span class="elo-change gain">(+26)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">12–1, 15–3</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-0 day-start"><td class="date"><strong>Mon, Oct 19</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a><span class="opponent-elo">Elo 1605 vs ours: 1601 <span class="elo-change loss">(-30)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores"><span class="score-loss">6–21</span>, <span class="score-loss">6–13</span></td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-0"><td class="date"><strong>Mon, Oct 19</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a><span class="opponent-elo">Elo 1404 vs ours: 1570 <span class="elo-change gain">(+17)</span></span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">12–3, 12–7</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-1 day-start"><td class="date"><strong>Mon, Oct 26</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a><span class="opponent-elo">Elo 1605 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-1"><td class="date"><strong>Mon, Oct 26</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a><span class="opponent-elo">Elo 1489 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-2 day-start"><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a><span class="opponent-elo">Elo 1561 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-2"><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-racketeers">racketeers</a><span class="opponent-elo">Elo 1565 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-3 day-start"><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a><span class="opponent-elo">Elo 1662 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 1</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-3"><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a><span class="opponent-elo">Elo 1605 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+      <tr class="day-3 day-start" data-align-key="2026-11-09-0"><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a><span class="opponent-elo">Elo 1605 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-3" data-align-key="2026-11-09-1"><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a><span class="opponent-elo">Elo 1662 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 1</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-2 day-start" data-align-key="2026-11-02-0"><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-racketeers">racketeers</a><span class="opponent-elo">Elo 1565 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-2" data-align-key="2026-11-02-1"><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a><span class="opponent-elo">Elo 1561 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-1 day-start" data-align-key="2026-10-26-0"><td class="date"><strong>Mon, Oct 26</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a><span class="opponent-elo">Elo 1489 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-1" data-align-key="2026-10-26-1"><td class="date"><strong>Mon, Oct 26</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a><span class="opponent-elo">Elo 1605 vs ours: 1588</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-0 day-start" data-align-key="2026-10-19-0"><td class="date"><strong>Mon, Oct 19</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a><span class="opponent-elo">Elo 1404 vs ours: 1570 <span class="elo-change gain">(+17)</span></span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">12–3, 12–7</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-0" data-align-key="2026-10-19-1"><td class="date"><strong>Mon, Oct 19</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a><span class="opponent-elo">Elo 1605 vs ours: 1601 <span class="elo-change loss">(-30)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores"><span class="score-loss">6–21</span>, <span class="score-loss">6–13</span></td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-4 day-start" data-align-key="2026-10-05-0"><td class="date"><strong>Mon, Oct 5</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a><span class="opponent-elo">Elo 1522 vs ours: 1575 <span class="elo-change gain">(+26)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">12–1, 15–3</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-4" data-align-key="2026-10-05-1"><td class="date"><strong>Mon, Oct 5</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-racketeers">racketeers</a><span class="opponent-elo">Elo 1549 vs ours: 1610 <span class="elo-change loss">(-36)</span></span></th><td>Oakwood Collegiate · Court 1</td><td class="scores"><span class="score-loss">5–12</span>, <span class="score-loss">8–12</span></td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-3 day-start" data-align-key="2026-09-28-0"><td class="date"><strong>Mon, Sep 28</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-dixon-cider">Dixon Cider</a><span class="opponent-elo">Elo 1563 vs ours: 1582 <span class="elo-change gain">(+29)</span></span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">8–7, 13–4</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-3" data-align-key="2026-09-28-1"><td class="date"><strong>Mon, Sep 28</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a><span class="opponent-elo">Elo 1500 vs ours: 1556 <span class="elo-change gain">(+26)</span></span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">15–1, 11–1</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-2 day-start" data-align-key="2026-09-21-0"><td class="date"><strong>Mon, Sep 21</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a><span class="opponent-elo">Elo 1469 vs ours: 1531 <span class="elo-change gain">(+25)</span></span></th><td>Senhor Santo Cristo C.S. · Court 3</td><td class="scores">8–2, 8–2</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-2" data-align-key="2026-09-21-1"><td class="date"><strong>Mon, Sep 21</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-s2">S2</a><span class="opponent-elo">Elo 1500 vs ours: 1500 <span class="elo-change gain">(+31)</span></span></th><td>Senhor Santo Cristo C.S. · Court 3</td><td class="scores">8–1, 8–1</td><td><span class="status complete">Complete</span></td></tr>
       </tbody></table></div></div>
 <div class="card" id="team-how-i-met-your-paddle"><div class="panelhead"><div><h2>How I Met Your Paddle</h2>
       <p class="note">Games at the same time against the same opponent are grouped as one fixture. Completed fixtures show starting Elo and the combined change from those games.</p></div></div>
       <div class="scroll"><table><thead><tr><th scope="col" style="text-align:left">Date &amp; time</th><th scope="col">Opponent</th><th scope="col">Location</th><th scope="col">Scores</th><th scope="col">Status</th></tr></thead><tbody>
-      <tr class="day-2 day-start"><td class="date"><strong>Mon, Sep 21</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a><span class="opponent-elo">Elo 1500 vs ours: 1500 <span class="elo-change loss">(-31)</span></span></th><td>Senhor Santo Cristo C.S. · Court 2</td><td class="scores"><span class="score-loss">2–10</span>, <span class="score-loss">6–7</span></td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-2"><td class="date"><strong>Mon, Sep 21</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-pb-jl">PB+JL</a><span class="opponent-elo">Elo 1500 vs ours: 1469 <span class="elo-change unchanged">(+0)</span></span></th><td>Senhor Santo Cristo C.S. · Court 3</td><td class="scores">5–0, 5–0</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-3 day-start"><td class="date"><strong>Mon, Sep 28</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a><span class="opponent-elo">Elo 1442 vs ours: 1469 <span class="elo-change gain">(+28)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">11–7, 11–2</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-3"><td class="date"><strong>Mon, Sep 28</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a><span class="opponent-elo">Elo 1450 vs ours: 1498 <span class="elo-change gain">(+26)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">10–2, 11–6</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-4 day-start"><td class="date"><strong>Mon, Oct 5</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a><span class="opponent-elo">Elo 1542 vs ours: 1524 <span class="elo-change gain">(+32)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">9–5, 11–3</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-4"><td class="date"><strong>Mon, Oct 5</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-volley-parton">Volley Parton</a><span class="opponent-elo">Elo 1489 vs ours: 1556 <span class="elo-change gain">(+25)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">11–4, 9–5</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-0 day-start"><td class="date"><strong>Mon, Oct 19</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a><span class="opponent-elo">Elo 1510 vs ours: 1581 <span class="elo-change gain">(+24)</span></span></th><td>Oakwood Collegiate · Court 1</td><td class="scores">9–8, 9–5</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-0"><td class="date"><strong>Mon, Oct 19</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a><span class="opponent-elo">Elo 1339 vs ours: 1605 <span class="elo-change unchanged">(+0)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">5–0, 5–0</td><td><span class="status complete">Complete</span></td></tr>
-<tr class="day-1 day-start"><td class="date"><strong>Mon, Oct 26</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-hamr-time">Hamr Time</a><span class="opponent-elo">Elo 1588 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-1"><td class="date"><strong>Mon, Oct 26</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-racketeers">racketeers</a><span class="opponent-elo">Elo 1565 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-2 day-start"><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a><span class="opponent-elo">Elo 1489 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-2"><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a><span class="opponent-elo">Elo 1662 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 1</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-3 day-start"><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a><span class="opponent-elo">Elo 1561 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
-<tr class="day-3"><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-hamr-time">Hamr Time</a><span class="opponent-elo">Elo 1588 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+      <tr class="day-3 day-start" data-align-key="2026-11-09-0"><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-hamr-time">Hamr Time</a><span class="opponent-elo">Elo 1588 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-3" data-align-key="2026-11-09-1"><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a><span class="opponent-elo">Elo 1561 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-2 day-start" data-align-key="2026-11-02-0"><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a><span class="opponent-elo">Elo 1662 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 1</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-2" data-align-key="2026-11-02-1"><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a><span class="opponent-elo">Elo 1489 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-1 day-start" data-align-key="2026-10-26-0"><td class="date"><strong>Mon, Oct 26</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-racketeers">racketeers</a><span class="opponent-elo">Elo 1565 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 3</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-1" data-align-key="2026-10-26-1"><td class="date"><strong>Mon, Oct 26</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-hamr-time">Hamr Time</a><span class="opponent-elo">Elo 1588 vs ours: 1605</span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">—, —</td><td><span class="status scheduled">Scheduled</span></td></tr>
+<tr class="day-0 day-start" data-align-key="2026-10-19-0"><td class="date"><strong>Mon, Oct 19</strong><span>6:55 PM</span></td><th scope="row"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a><span class="opponent-elo">Elo 1339 vs ours: 1605 <span class="elo-change unchanged">(+0)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">5–0, 5–0</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-0" data-align-key="2026-10-19-1"><td class="date"><strong>Mon, Oct 19</strong><span>6:30 PM</span></td><th scope="row"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a><span class="opponent-elo">Elo 1510 vs ours: 1581 <span class="elo-change gain">(+24)</span></span></th><td>Oakwood Collegiate · Court 1</td><td class="scores">9–8, 9–5</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-4 day-start" data-align-key="2026-10-05-0"><td class="date"><strong>Mon, Oct 5</strong><span>8:35 PM</span></td><th scope="row"><a class="team-link" href="#team-volley-parton">Volley Parton</a><span class="opponent-elo">Elo 1489 vs ours: 1556 <span class="elo-change gain">(+25)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">11–4, 9–5</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-4" data-align-key="2026-10-05-1"><td class="date"><strong>Mon, Oct 5</strong><span>8:10 PM</span></td><th scope="row"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a><span class="opponent-elo">Elo 1542 vs ours: 1524 <span class="elo-change gain">(+32)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">9–5, 11–3</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-3 day-start" data-align-key="2026-09-28-0"><td class="date"><strong>Mon, Sep 28</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a><span class="opponent-elo">Elo 1450 vs ours: 1498 <span class="elo-change gain">(+26)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">10–2, 11–6</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-3" data-align-key="2026-09-28-1"><td class="date"><strong>Mon, Sep 28</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a><span class="opponent-elo">Elo 1442 vs ours: 1469 <span class="elo-change gain">(+28)</span></span></th><td>Oakwood Collegiate · Court 2</td><td class="scores">11–7, 11–2</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-2 day-start" data-align-key="2026-09-21-0"><td class="date"><strong>Mon, Sep 21</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-pb-jl">PB+JL</a><span class="opponent-elo">Elo 1500 vs ours: 1469 <span class="elo-change unchanged">(+0)</span></span></th><td>Senhor Santo Cristo C.S. · Court 3</td><td class="scores">5–0, 5–0</td><td><span class="status complete">Complete</span></td></tr>
+<tr class="day-2" data-align-key="2026-09-21-1"><td class="date"><strong>Mon, Sep 21</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a><span class="opponent-elo">Elo 1500 vs ours: 1500 <span class="elo-change loss">(-31)</span></span></th><td>Senhor Santo Cristo C.S. · Court 2</td><td class="scores"><span class="score-loss">2–10</span>, <span class="score-loss">6–7</span></td><td><span class="status complete">Complete</span></td></tr>
       </tbody></table></div></div></div>
   </section>
   <section class="panel" id="all-teams" role="tabpanel" aria-labelledby="tab-all-teams" hidden>
@@ -695,6 +701,27 @@
   <footer>PF = points for; PA = points against. Ratings are an independent calculation from LeagueApps results.</footer>
 </main>
 <script>
+  function alignSchedules() {
+    const panel = document.getElementById('schedule');
+    if (panel.hidden) return;
+    const cards = [...panel.querySelectorAll('.card')];
+    const groups = new Map();
+    const add = (key, node) => {
+      node.style.height = '';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(node);
+    };
+    cards.forEach(card => {
+      add('heading', card.querySelector('.panelhead'));
+      add('columns', card.querySelector('thead tr'));
+      card.querySelectorAll('[data-align-key]').forEach(row => add(row.dataset.alignKey, row));
+    });
+    if (window.matchMedia('(max-width:1000px)').matches) return;
+    const heights = [...groups.values()].map(nodes => ({
+      nodes, height: Math.max(...nodes.map(node => node.getBoundingClientRect().height)),
+    }));
+    heights.forEach(({nodes, height}) => nodes.forEach(node => { node.style.height = height + 'px'; }));
+  }
   const tabs = [...document.querySelectorAll('[aria-label="Dashboard views"] [role="tab"]')];
   history.scrollRestoration = 'manual';
   function currentView() {
@@ -707,6 +734,7 @@
   }
   function selectTab(tab, updateHistory = true) {
     tabs.forEach(item => { const active = item === tab; item.setAttribute('aria-selected', active); document.getElementById(item.getAttribute('aria-controls')).hidden = !active; });
+    alignSchedules();
     if (updateHistory) history.replaceState(currentView(), '', '#' + tab.getAttribute('aria-controls'));
   }
   tabs.forEach((tab, index) => {
@@ -763,6 +791,12 @@
   }
   window.addEventListener('popstate', restoreView);
   window.addEventListener('hashchange', restoreView);
+  let scheduleWidth = 0;
+  new ResizeObserver(entries => {
+    const width = entries[0].contentRect.width;
+    if (width !== scheduleWidth) { scheduleWidth = width; alignSchedules(); }
+  }).observe(document.querySelector('#schedule .schedule-stack'));
+  document.fonts.ready.then(alignSchedules);
   if (history.state && history.state.dashboardTab) {
     restoreView();
   } else {
