@@ -76,6 +76,21 @@
   .team-schedules h2:focus { outline:none; }
   .scores { font-weight:700; }
   .score-loss { color:#ff9696; }
+  .plot-wrap { overflow-x:auto; padding:0 12px; }
+  .elo-plot { display:block; width:100%; min-width:700px; }
+  .elo-plot polyline { pointer-events:stroke; cursor:pointer; transition:opacity .15s, stroke-width .15s; }
+  .elo-plot.plot-highlight polyline:not(.plot-active) { opacity:.12; }
+  .elo-plot polyline.plot-active { stroke-width:5; }
+  .plot-grid { stroke:#405349; stroke-width:1; }
+  .plot-axis { fill:var(--muted); font-size:12px; }
+  .plot-legend { display:flex; flex-wrap:wrap; gap:8px 16px; padding:10px 22px 22px; }
+  .plot-legend-item { display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; }
+  .plot-legend-item.plot-active { color:#fff; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+  .plot-swatch { width:16px; height:4px; border-radius:2px; }
+  .match-team { text-align:left; }
+  .match-rating { background:hsl(var(--elo-hue) 42% 22%); color:hsl(var(--elo-hue) 65% 88%); }
+  .match-rating .opponent-elo { color:inherit; opacity:.85; }
+  #next-week [hidden] { display:none; }
   .status { display:inline-block; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:800; }
   .status.complete { color:#9edbb5; background:#254532; }
   .status.scheduled { color:#edcb8c; background:#44371f; }
@@ -87,7 +102,7 @@
 <body>
 <main class="wrap">
   <header><div><p class="eyebrow">Fall 2026 · Monday tiered pairs</p><h1>Pickleball</h1>
-    <p class="subtitle">Updated Oct 26, 2026 at 11:10 PM EDT.</p></div>
+    <p class="subtitle">Updated Oct 28, 2026 at 3:27 PM EDT.</p></div>
     <a class="source" href="https://offlimitsports.leagueapps.com/leagues/5080557/schedule" target="_blank" rel="noopener">LeagueApps schedule ↗</a></header>
   <div class="tabs" role="tablist" aria-label="Dashboard views">
     <button class="tab" id="tab-elo" role="tab" aria-controls="elo" aria-selected="true">Elo ratings</button>
@@ -96,6 +111,8 @@
     <button class="tab" id="tab-tiers" role="tab" aria-controls="tiers" aria-selected="false">Tiers</button>
     <button class="tab" id="tab-all-teams" role="tab" aria-controls="all-teams" aria-selected="false">All Teams</button>
     <button class="tab" id="tab-results" role="tab" aria-controls="results" aria-selected="false">All Results</button>
+    <button class="tab" id="tab-plot" role="tab" aria-controls="plot" aria-selected="false">Plot</button>
+    <button class="tab" id="tab-next-week" role="tab" aria-controls="next-week" aria-selected="false">Next Week</button>
   </div>
   <section class="panel" id="standings" role="tabpanel" aria-labelledby="tab-standings" hidden>
     <div class="card"><div class="panelhead"><div><h2>League standings</h2><p class="note">Each scored game counts separately. Ranked by win percentage, wins, then point differential.</p></div></div>
@@ -190,6 +207,115 @@
 <tr class="day-2 day-start" data-align-key="2026-09-21-0"><td class="date"><strong>Mon, Sep 21</strong><span>7:20 PM</span></td><th scope="row"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a><span class="opponent-elo">Elo 1500 vs ours: 1500 <span class="elo-change loss">(-31)</span> · <span title="How I Met Your Paddle&#x27;s estimated win probability per game, based on pre-fixture Elo.">Win: 50%</span></span></th><td class="scores"><span class="score-loss">2–10</span>, <span class="score-loss">6–7</span></td><td><span class="status complete">Complete</span></td></tr>
 <tr class="day-2" data-align-key="2026-09-21-1"><td class="date"><strong>Mon, Sep 21</strong><span>7:45 PM</span></td><th scope="row"><a class="team-link" href="#team-pb-jl">PB+JL</a><span class="opponent-elo">Elo 1500 vs ours: 1469 <span class="elo-change unchanged">(+0)</span> · <span title="How I Met Your Paddle&#x27;s estimated win probability per game, based on pre-fixture Elo.">Win: 46%</span></span></th><td class="scores">5–0, 5–0</td><td><span class="status complete">Complete</span></td></tr>
       </tbody></table></div></div></div>
+  </section>
+  <section class="panel" id="plot" role="tabpanel" aria-labelledby="tab-plot" hidden>
+    <div class="card"><div class="panelhead"><div><h2>Team Elo over time</h2>
+      <p class="note">Ratings start at 1500; each point shows Elo after the day’s games. Forfeits are excluded. Select teams below to show or hide their lines.</p></div></div>
+      <div class="plot-wrap"><svg class="elo-plot" viewBox="0 0 1000 620" role="img" aria-label="Team Elo ratings over time"><line class="plot-grid" x1="70" y1="570.0" x2="970" y2="570.0"/><text class="plot-axis" x="60" y="574.0" text-anchor="end">1300</text>
+<line class="plot-grid" x1="70" y1="511.1" x2="970" y2="511.1"/><text class="plot-axis" x="60" y="515.1" text-anchor="end">1350</text>
+<line class="plot-grid" x1="70" y1="452.2" x2="970" y2="452.2"/><text class="plot-axis" x="60" y="456.2" text-anchor="end">1400</text>
+<line class="plot-grid" x1="70" y1="393.3" x2="970" y2="393.3"/><text class="plot-axis" x="60" y="397.3" text-anchor="end">1450</text>
+<line class="plot-grid" x1="70" y1="334.4" x2="970" y2="334.4"/><text class="plot-axis" x="60" y="338.4" text-anchor="end">1500</text>
+<line class="plot-grid" x1="70" y1="275.6" x2="970" y2="275.6"/><text class="plot-axis" x="60" y="279.6" text-anchor="end">1550</text>
+<line class="plot-grid" x1="70" y1="216.7" x2="970" y2="216.7"/><text class="plot-axis" x="60" y="220.7" text-anchor="end">1600</text>
+<line class="plot-grid" x1="70" y1="157.8" x2="970" y2="157.8"/><text class="plot-axis" x="60" y="161.8" text-anchor="end">1650</text>
+<line class="plot-grid" x1="70" y1="98.9" x2="970" y2="98.9"/><text class="plot-axis" x="60" y="102.9" text-anchor="end">1700</text>
+<line class="plot-grid" x1="70" y1="40.0" x2="970" y2="40.0"/><text class="plot-axis" x="60" y="44.0" text-anchor="end">1750</text>
+<text class="plot-axis" x="95.0" y="595" text-anchor="middle">Sep 21</text>
+<text class="plot-axis" x="270.0" y="595" text-anchor="middle">Sep 28</text>
+<text class="plot-axis" x="445.0" y="595" text-anchor="middle">Oct 5</text>
+<text class="plot-axis" x="795.0" y="595" text-anchor="middle">Oct 19</text>
+<text class="plot-axis" x="970.0" y="595" text-anchor="middle">Oct 26</text>
+<polyline data-plot-team="team-flying-squirrels" points="70.0,334.4 95.0,301.6 270.0,230.7 445.0,210.5 795.0,143.5 970.0,108.3" fill="none" stroke="hsl(0 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Flying Squirrels</title></polyline>
+<polyline data-plot-team="team-hamr-time" points="70.0,334.4 95.0,268.7 270.0,204.4 445.0,216.0 795.0,231.3 970.0,205.8" fill="none" stroke="hsl(138 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Hamr Time</title></polyline>
+<polyline data-plot-team="team-j-squared" points="70.0,334.4 445.0,263.3 795.0,214.9 970.0,207.8" fill="none" stroke="hsl(275 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>J squared</title></polyline>
+<polyline data-plot-team="team-how-i-met-your-paddle" points="70.0,334.4 95.0,370.4 270.0,306.2 445.0,239.2 795.0,210.3 970.0,210.4" fill="none" stroke="hsl(53 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>How I Met Your Paddle</title></polyline>
+<polyline data-plot-team="team-pb-jl" points="70.0,334.4 270.0,336.4 445.0,342.2 795.0,320.8 970.0,252.4" fill="none" stroke="hsl(190 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>PB+JL</title></polyline>
+<polyline data-plot-team="team-racketeers" points="70.0,334.4 95.0,268.7 270.0,276.6 445.0,234.3 795.0,257.6 970.0,257.6" fill="none" stroke="hsl(328 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>racketeers</title></polyline>
+<polyline data-plot-team="team-unproven-net-gains" points="70.0,334.4 270.0,284.8 445.0,292.7 795.0,262.8 970.0,287.9" fill="none" stroke="hsl(105 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Unproven Net Gains</title></polyline>
+<polyline data-plot-team="team-smazzazi" points="70.0,334.4 270.0,336.5 795.0,280.3 970.0,298.2" fill="none" stroke="hsl(243 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Smazzazi</title></polyline>
+<polyline data-plot-team="team-sonic-boomers" points="70.0,334.4 95.0,298.5 970.0,298.5" fill="none" stroke="hsl(20 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Sonic Boomers</title></polyline>
+<polyline data-plot-team="team-michael-arseneau" points="70.0,334.4 445.0,269.6 795.0,292.8 970.0,304.2" fill="none" stroke="hsl(158 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Michael Arseneau</title></polyline>
+<polyline data-plot-team="team-tickleballerz" points="70.0,334.4 95.0,298.5 270.0,322.4 445.0,322.3 795.0,322.4 970.0,354.4" fill="none" stroke="hsl(295 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Tickleballerz</title></polyline>
+<polyline data-plot-team="team-dixon-cider" points="70.0,334.4 95.0,298.5 270.0,294.0 970.0,355.8" fill="none" stroke="hsl(73 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Dixon Cider</title></polyline>
+<polyline data-plot-team="team-serve-queens" points="70.0,334.4 270.0,346.7 445.0,378.7 795.0,367.4 970.0,367.4" fill="none" stroke="hsl(210 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Serve Queens</title></polyline>
+<polyline data-plot-team="team-volley-parton" points="70.0,334.4 95.0,370.4 270.0,370.2 445.0,376.3 795.0,393.1 970.0,382.6" fill="none" stroke="hsl(348 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Volley Parton</title></polyline>
+<polyline data-plot-team="team-one-hit-wonder" points="70.0,334.4 95.0,268.7 270.0,339.4 445.0,338.9 795.0,347.1 970.0,382.7" fill="none" stroke="hsl(125 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>One Hit Wonder</title></polyline>
+<polyline data-plot-team="team-s2" points="70.0,334.4 95.0,400.2 270.0,370.8 445.0,371.0 795.0,426.2 970.0,414.8" fill="none" stroke="hsl(263 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>S2</title></polyline>
+<polyline data-plot-team="team-dynamic-duo" points="70.0,334.4 445.0,370.4 795.0,424.3 970.0,424.3" fill="none" stroke="hsl(40 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Dynamic Duo</title></polyline>
+<polyline data-plot-team="team-the-jar-openers" points="70.0,334.4 270.0,395.7 445.0,447.0 795.0,467.1 970.0,431.0" fill="none" stroke="hsl(178 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>The Jar Openers</title></polyline>
+<polyline data-plot-team="team-tickle-my-pickle" points="70.0,334.4 95.0,400.2 270.0,424.2 445.0,422.1 795.0,464.0 970.0,481.4" fill="none" stroke="hsl(315 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Tickle my Pickle</title></polyline>
+<polyline data-plot-team="team-serving-justice" points="70.0,334.4 95.0,400.2 270.0,413.3 445.0,475.2 795.0,480.2 970.0,485.2" fill="none" stroke="hsl(93 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Serving Justice</title></polyline>
+<polyline data-plot-team="team-paddle-queens" points="70.0,334.4 95.0,403.2 270.0,469.4 445.0,524.5 970.0,512.5" fill="none" stroke="hsl(230 75% 70%)" stroke-width="2.5" vector-effect="non-scaling-stroke"><title>Paddle Queens</title></polyline></svg></div>
+      <div class="plot-legend" aria-label="Teams shown on the plot"><label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-flying-squirrels"><span class="plot-swatch" style="background:hsl(0 75% 70%)"></span>Flying Squirrels</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-hamr-time"><span class="plot-swatch" style="background:hsl(138 75% 70%)"></span>Hamr Time</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-j-squared"><span class="plot-swatch" style="background:hsl(275 75% 70%)"></span>J squared</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-how-i-met-your-paddle"><span class="plot-swatch" style="background:hsl(53 75% 70%)"></span>How I Met Your Paddle</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-pb-jl"><span class="plot-swatch" style="background:hsl(190 75% 70%)"></span>PB+JL</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-racketeers"><span class="plot-swatch" style="background:hsl(328 75% 70%)"></span>racketeers</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-unproven-net-gains"><span class="plot-swatch" style="background:hsl(105 75% 70%)"></span>Unproven Net Gains</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-smazzazi"><span class="plot-swatch" style="background:hsl(243 75% 70%)"></span>Smazzazi</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-sonic-boomers"><span class="plot-swatch" style="background:hsl(20 75% 70%)"></span>Sonic Boomers</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-michael-arseneau"><span class="plot-swatch" style="background:hsl(158 75% 70%)"></span>Michael Arseneau</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-tickleballerz"><span class="plot-swatch" style="background:hsl(295 75% 70%)"></span>Tickleballerz</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-dixon-cider"><span class="plot-swatch" style="background:hsl(73 75% 70%)"></span>Dixon Cider</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-serve-queens"><span class="plot-swatch" style="background:hsl(210 75% 70%)"></span>Serve Queens</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-volley-parton"><span class="plot-swatch" style="background:hsl(348 75% 70%)"></span>Volley Parton</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-one-hit-wonder"><span class="plot-swatch" style="background:hsl(125 75% 70%)"></span>One Hit Wonder</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-s2"><span class="plot-swatch" style="background:hsl(263 75% 70%)"></span>S2</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-dynamic-duo"><span class="plot-swatch" style="background:hsl(40 75% 70%)"></span>Dynamic Duo</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-the-jar-openers"><span class="plot-swatch" style="background:hsl(178 75% 70%)"></span>The Jar Openers</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-tickle-my-pickle"><span class="plot-swatch" style="background:hsl(315 75% 70%)"></span>Tickle my Pickle</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-serving-justice"><span class="plot-swatch" style="background:hsl(93 75% 70%)"></span>Serving Justice</label>
+<label class="plot-legend-item"><input type="checkbox" checked data-plot-toggle="team-paddle-queens"><span class="plot-swatch" style="background:hsl(230 75% 70%)"></span>Paddle Queens</label></div>
+    </div>
+  </section>
+  <section class="panel" id="next-week" role="tabpanel" aria-labelledby="tab-next-week" hidden>
+    <div class="card"><div class="panelhead"><div><h2>Next week · <span id="next-week-dates"></span></h2>
+      <p class="note">Sorted by the difference between teams’ Elo win probabilities, largest first. Team colors range from red for lower Elo to green for higher Elo. Difference is in percentage points, calculated before rounding. Ratings reflect the latest page update. Paired games are grouped together; times are Toronto time.</p></div></div>
+      <div class="scroll"><table><thead><tr><th scope="col" style="text-align:left">Date &amp; time</th><th scope="col">Team 1</th><th scope="col">Win</th><th scope="col">Team 2</th><th scope="col">Win</th><th scope="col">Difference</th></tr></thead><tbody>
+      <tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:120.0"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a> <span class="opponent-elo">Elo 1692</span></th><td class="match-rating" style="--elo-hue:120.0">79%</td><td class="match-team match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a> <span class="opponent-elo">Elo 1459</span></td><td class="match-rating" style="--elo-hue:38.6">21%</td><td>58.5 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:61.8"><a class="team-link" href="#team-michael-arseneau">Michael Arseneau</a> <span class="opponent-elo">Elo 1526</span></th><td class="match-rating" style="--elo-hue:61.8">71%</td><td class="match-team match-rating" style="--elo-hue:8.1"><a class="team-link" href="#team-serving-justice">Serving Justice</a> <span class="opponent-elo">Elo 1372</span></td><td class="match-rating" style="--elo-hue:8.1">29%</td><td>41.6 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>8:10 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:77.2"><a class="team-link" href="#team-pb-jl">PB+JL</a> <span class="opponent-elo">Elo 1570</span></th><td class="match-rating" style="--elo-hue:77.2">71%</td><td class="match-team match-rating" style="--elo-hue:24.2"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a> <span class="opponent-elo">Elo 1418</span></td><td class="match-rating" style="--elo-hue:24.2">29%</td><td>41.1 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:61.8"><a class="team-link" href="#team-michael-arseneau">Michael Arseneau</a> <span class="opponent-elo">Elo 1526</span></th><td class="match-rating" style="--elo-hue:61.8">70%</td><td class="match-team match-rating" style="--elo-hue:9.2"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a> <span class="opponent-elo">Elo 1375</span></td><td class="match-rating" style="--elo-hue:9.2">30%</td><td>40.8 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:89.7"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a> <span class="opponent-elo">Elo 1605</span></th><td class="match-rating" style="--elo-hue:89.7">70%</td><td class="match-team match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a> <span class="opponent-elo">Elo 1459</span></td><td class="match-rating" style="--elo-hue:38.6">30%</td><td>39.8 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:120.0"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a> <span class="opponent-elo">Elo 1692</span></th><td class="match-rating" style="--elo-hue:120.0">67%</td><td class="match-team match-rating" style="--elo-hue:75.7"><a class="team-link" href="#team-racketeers">racketeers</a> <span class="opponent-elo">Elo 1565</span></td><td class="match-rating" style="--elo-hue:75.7">33%</td><td>35.0 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:90.5"><a class="team-link" href="#team-j-squared">J squared</a> <span class="opponent-elo">Elo 1608</span></th><td class="match-rating" style="--elo-hue:90.5">67%</td><td class="match-team match-rating" style="--elo-hue:46.5"><a class="team-link" href="#team-dixon-cider">Dixon Cider</a> <span class="opponent-elo">Elo 1482</span></td><td class="match-rating" style="--elo-hue:46.5">33%</td><td>34.7 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:90.5"><a class="team-link" href="#team-j-squared">J squared</a> <span class="opponent-elo">Elo 1608</span></th><td class="match-rating" style="--elo-hue:90.5">67%</td><td class="match-team match-rating" style="--elo-hue:46.9"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a> <span class="opponent-elo">Elo 1483</span></td><td class="match-rating" style="--elo-hue:46.9">33%</td><td>34.4 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:43.1"><a class="team-link" href="#team-serve-queens">Serve Queens</a> <span class="opponent-elo">Elo 1472</span></th><td class="match-rating" style="--elo-hue:43.1">67%</td><td class="match-team match-rating" style="--elo-hue:0.0"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a> <span class="opponent-elo">Elo 1349</span></td><td class="match-rating" style="--elo-hue:0.0">33%</td><td>34.1 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:63.6"><a class="team-link" href="#team-smazzazi">Smazzazi</a> <span class="opponent-elo">Elo 1531</span></th><td class="match-rating" style="--elo-hue:63.6">66%</td><td class="match-team match-rating" style="--elo-hue:24.2"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a> <span class="opponent-elo">Elo 1418</span></td><td class="match-rating" style="--elo-hue:24.2">34%</td><td>31.4 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-volley-parton">Volley Parton</a> <span class="opponent-elo">Elo 1459</span></th><td class="match-rating" style="--elo-hue:38.6">65%</td><td class="match-team match-rating" style="--elo-hue:0.0"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a> <span class="opponent-elo">Elo 1349</span></td><td class="match-rating" style="--elo-hue:0.0">35%</td><td>30.7 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:75.7"><a class="team-link" href="#team-racketeers">racketeers</a> <span class="opponent-elo">Elo 1565</span></th><td class="match-rating" style="--elo-hue:75.7">65%</td><td class="match-team match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a> <span class="opponent-elo">Elo 1459</span></td><td class="match-rating" style="--elo-hue:38.6">35%</td><td>29.6 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:61.8"><a class="team-link" href="#team-michael-arseneau">Michael Arseneau</a> <span class="opponent-elo">Elo 1526</span></th><td class="match-rating" style="--elo-hue:61.8">64%</td><td class="match-team match-rating" style="--elo-hue:26.2"><a class="team-link" href="#team-dynamic-duo">Dynamic Duo</a> <span class="opponent-elo">Elo 1424</span></td><td class="match-rating" style="--elo-hue:26.2">36%</td><td>28.5 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-volley-parton">Volley Parton</a> <span class="opponent-elo">Elo 1459</span></th><td class="match-rating" style="--elo-hue:38.6">62%</td><td class="match-team match-rating" style="--elo-hue:8.1"><a class="team-link" href="#team-serving-justice">Serving Justice</a> <span class="opponent-elo">Elo 1372</span></td><td class="match-rating" style="--elo-hue:8.1">38%</td><td>24.5 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:120.0"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a> <span class="opponent-elo">Elo 1692</span></th><td class="match-rating" style="--elo-hue:120.0">62%</td><td class="match-team match-rating" style="--elo-hue:89.7"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a> <span class="opponent-elo">Elo 1605</span></td><td class="match-rating" style="--elo-hue:89.7">38%</td><td>24.5 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:77.2"><a class="team-link" href="#team-pb-jl">PB+JL</a> <span class="opponent-elo">Elo 1570</span></th><td class="match-rating" style="--elo-hue:77.2">62%</td><td class="match-team match-rating" style="--elo-hue:46.9"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a> <span class="opponent-elo">Elo 1483</span></td><td class="match-rating" style="--elo-hue:46.9">38%</td><td>24.4 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:29.0"><a class="team-link" href="#team-s2">S2</a> <span class="opponent-elo">Elo 1432</span></th><td class="match-rating" style="--elo-hue:29.0">62%</td><td class="match-team match-rating" style="--elo-hue:0.0"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a> <span class="opponent-elo">Elo 1349</span></td><td class="match-rating" style="--elo-hue:0.0">38%</td><td>23.4 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:120.0"><a class="team-link" href="#team-flying-squirrels">Flying Squirrels</a> <span class="opponent-elo">Elo 1692</span></th><td class="match-rating" style="--elo-hue:120.0">62%</td><td class="match-team match-rating" style="--elo-hue:91.0"><a class="team-link" href="#team-hamr-time">Hamr Time</a> <span class="opponent-elo">Elo 1609</span></td><td class="match-rating" style="--elo-hue:91.0">38%</td><td>23.4 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:66.7"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a> <span class="opponent-elo">Elo 1540</span></th><td class="match-rating" style="--elo-hue:66.7">61%</td><td class="match-team match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-one-hit-wonder">One Hit Wonder</a> <span class="opponent-elo">Elo 1459</span></td><td class="match-rating" style="--elo-hue:38.6">39%</td><td>22.8 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>8:10 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:90.5"><a class="team-link" href="#team-j-squared">J squared</a> <span class="opponent-elo">Elo 1608</span></th><td class="match-rating" style="--elo-hue:90.5">61%</td><td class="match-team match-rating" style="--elo-hue:63.6"><a class="team-link" href="#team-smazzazi">Smazzazi</a> <span class="opponent-elo">Elo 1531</span></td><td class="match-rating" style="--elo-hue:63.6">39%</td><td>21.7 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:26.2"><a class="team-link" href="#team-dynamic-duo">Dynamic Duo</a> <span class="opponent-elo">Elo 1424</span></th><td class="match-rating" style="--elo-hue:26.2">61%</td><td class="match-team match-rating" style="--elo-hue:0.0"><a class="team-link" href="#team-paddle-queens">Paddle Queens</a> <span class="opponent-elo">Elo 1349</span></td><td class="match-rating" style="--elo-hue:0.0">39%</td><td>21.2 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:91.0"><a class="team-link" href="#team-hamr-time">Hamr Time</a> <span class="opponent-elo">Elo 1609</span></th><td class="match-rating" style="--elo-hue:91.0">60%</td><td class="match-team match-rating" style="--elo-hue:66.7"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a> <span class="opponent-elo">Elo 1540</span></td><td class="match-rating" style="--elo-hue:66.7">40%</td><td>19.8 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>8:10 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:89.7"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a> <span class="opponent-elo">Elo 1605</span></th><td class="match-rating" style="--elo-hue:89.7">59%</td><td class="match-team match-rating" style="--elo-hue:66.7"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a> <span class="opponent-elo">Elo 1540</span></td><td class="match-rating" style="--elo-hue:66.7">41%</td><td>18.7 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>8:35 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:46.9"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a> <span class="opponent-elo">Elo 1483</span></th><td class="match-rating" style="--elo-hue:46.9">59%</td><td class="match-team match-rating" style="--elo-hue:24.2"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a> <span class="opponent-elo">Elo 1418</span></td><td class="match-rating" style="--elo-hue:24.2">41%</td><td>18.5 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:46.5"><a class="team-link" href="#team-dixon-cider">Dixon Cider</a> <span class="opponent-elo">Elo 1482</span></th><td class="match-rating" style="--elo-hue:46.5">59%</td><td class="match-team match-rating" style="--elo-hue:24.2"><a class="team-link" href="#team-the-jar-openers">The Jar Openers</a> <span class="opponent-elo">Elo 1418</span></td><td class="match-rating" style="--elo-hue:24.2">41%</td><td>18.2 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:29.0"><a class="team-link" href="#team-s2">S2</a> <span class="opponent-elo">Elo 1432</span></th><td class="match-rating" style="--elo-hue:29.0">59%</td><td class="match-team match-rating" style="--elo-hue:8.1"><a class="team-link" href="#team-serving-justice">Serving Justice</a> <span class="opponent-elo">Elo 1372</span></td><td class="match-rating" style="--elo-hue:8.1">41%</td><td>17.0 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:55 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:29.0"><a class="team-link" href="#team-s2">S2</a> <span class="opponent-elo">Elo 1432</span></th><td class="match-rating" style="--elo-hue:29.0">58%</td><td class="match-team match-rating" style="--elo-hue:9.2"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a> <span class="opponent-elo">Elo 1375</span></td><td class="match-rating" style="--elo-hue:9.2">42%</td><td>16.1 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:61.8"><a class="team-link" href="#team-michael-arseneau">Michael Arseneau</a> <span class="opponent-elo">Elo 1526</span></th><td class="match-rating" style="--elo-hue:61.8">58%</td><td class="match-team match-rating" style="--elo-hue:43.1"><a class="team-link" href="#team-serve-queens">Serve Queens</a> <span class="opponent-elo">Elo 1472</span></td><td class="match-rating" style="--elo-hue:43.1">42%</td><td>15.3 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>8:35 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:63.6"><a class="team-link" href="#team-smazzazi">Smazzazi</a> <span class="opponent-elo">Elo 1531</span></th><td class="match-rating" style="--elo-hue:63.6">57%</td><td class="match-team match-rating" style="--elo-hue:46.5"><a class="team-link" href="#team-dixon-cider">Dixon Cider</a> <span class="opponent-elo">Elo 1482</span></td><td class="match-rating" style="--elo-hue:46.5">43%</td><td>14.0 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:26.2"><a class="team-link" href="#team-dynamic-duo">Dynamic Duo</a> <span class="opponent-elo">Elo 1424</span></th><td class="match-rating" style="--elo-hue:26.2">57%</td><td class="match-team match-rating" style="--elo-hue:9.2"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a> <span class="opponent-elo">Elo 1375</span></td><td class="match-rating" style="--elo-hue:9.2">43%</td><td>13.9 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:91.0"><a class="team-link" href="#team-hamr-time">Hamr Time</a> <span class="opponent-elo">Elo 1609</span></th><td class="match-rating" style="--elo-hue:91.0">56%</td><td class="match-team match-rating" style="--elo-hue:75.7"><a class="team-link" href="#team-racketeers">racketeers</a> <span class="opponent-elo">Elo 1565</span></td><td class="match-rating" style="--elo-hue:75.7">44%</td><td>12.6 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:45 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:43.1"><a class="team-link" href="#team-serve-queens">Serve Queens</a> <span class="opponent-elo">Elo 1472</span></th><td class="match-rating" style="--elo-hue:43.1">56%</td><td class="match-team match-rating" style="--elo-hue:29.0"><a class="team-link" href="#team-s2">S2</a> <span class="opponent-elo">Elo 1432</span></td><td class="match-rating" style="--elo-hue:29.0">44%</td><td>11.5 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:77.2"><a class="team-link" href="#team-pb-jl">PB+JL</a> <span class="opponent-elo">Elo 1570</span></th><td class="match-rating" style="--elo-hue:77.2">56%</td><td class="match-team match-rating" style="--elo-hue:63.6"><a class="team-link" href="#team-smazzazi">Smazzazi</a> <span class="opponent-elo">Elo 1531</span></td><td class="match-rating" style="--elo-hue:63.6">44%</td><td>11.1 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>8:35 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:90.5"><a class="team-link" href="#team-j-squared">J squared</a> <span class="opponent-elo">Elo 1608</span></th><td class="match-rating" style="--elo-hue:90.5">55%</td><td class="match-team match-rating" style="--elo-hue:77.2"><a class="team-link" href="#team-pb-jl">PB+JL</a> <span class="opponent-elo">Elo 1570</span></td><td class="match-rating" style="--elo-hue:77.2">45%</td><td>10.8 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-volley-parton">Volley Parton</a> <span class="opponent-elo">Elo 1459</span></th><td class="match-rating" style="--elo-hue:38.6">55%</td><td class="match-team match-rating" style="--elo-hue:26.2"><a class="team-link" href="#team-dynamic-duo">Dynamic Duo</a> <span class="opponent-elo">Elo 1424</span></td><td class="match-rating" style="--elo-hue:26.2">45%</td><td>10.1 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:75.7"><a class="team-link" href="#team-racketeers">racketeers</a> <span class="opponent-elo">Elo 1565</span></th><td class="match-rating" style="--elo-hue:75.7">54%</td><td class="match-team match-rating" style="--elo-hue:66.7"><a class="team-link" href="#team-unproven-net-gains">Unproven Net Gains</a> <span class="opponent-elo">Elo 1540</span></td><td class="match-rating" style="--elo-hue:66.7">46%</td><td>7.4 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>6:30 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:43.1"><a class="team-link" href="#team-serve-queens">Serve Queens</a> <span class="opponent-elo">Elo 1472</span></th><td class="match-rating" style="--elo-hue:43.1">52%</td><td class="match-team match-rating" style="--elo-hue:38.6"><a class="team-link" href="#team-volley-parton">Volley Parton</a> <span class="opponent-elo">Elo 1459</span></td><td class="match-rating" style="--elo-hue:38.6">48%</td><td>3.7 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>8:35 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:91.0"><a class="team-link" href="#team-hamr-time">Hamr Time</a> <span class="opponent-elo">Elo 1609</span></th><td class="match-rating" style="--elo-hue:91.0">51%</td><td class="match-team match-rating" style="--elo-hue:89.7"><a class="team-link" href="#team-how-i-met-your-paddle">How I Met Your Paddle</a> <span class="opponent-elo">Elo 1605</span></td><td class="match-rating" style="--elo-hue:89.7">49%</td><td>1.1 pp</td></tr>
+<tr data-match-date="2026-11-09" hidden><td class="date"><strong>Mon, Nov 9</strong><span>7:20 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:9.2"><a class="team-link" href="#team-tickle-my-pickle">Tickle my Pickle</a> <span class="opponent-elo">Elo 1375</span></th><td class="match-rating" style="--elo-hue:9.2">50%</td><td class="match-team match-rating" style="--elo-hue:8.1"><a class="team-link" href="#team-serving-justice">Serving Justice</a> <span class="opponent-elo">Elo 1372</span></td><td class="match-rating" style="--elo-hue:8.1">50%</td><td>0.9 pp</td></tr>
+<tr data-match-date="2026-11-02" hidden><td class="date"><strong>Mon, Nov 2</strong><span>8:10 PM</span></td><th scope="row" class="match-rating" style="--elo-hue:46.9"><a class="team-link" href="#team-tickleballerz">Tickleballerz</a> <span class="opponent-elo">Elo 1483</span></th><td class="match-rating" style="--elo-hue:46.9">50%</td><td class="match-team match-rating" style="--elo-hue:46.5"><a class="team-link" href="#team-dixon-cider">Dixon Cider</a> <span class="opponent-elo">Elo 1482</span></td><td class="match-rating" style="--elo-hue:46.5">50%</td><td>0.3 pp</td></tr>
+      <tr id="next-week-empty" hidden><td colspan="6" class="empty">No games are scheduled for next week.</td></tr>
+      </tbody></table></div></div>
   </section>
   <section class="panel" id="all-teams" role="tabpanel" aria-labelledby="tab-all-teams" hidden>
     <p class="note" style="margin:0 0 14px">Times shown in Toronto. Played fixtures show Elo before the fixture; upcoming fixtures show current Elo.</p>
@@ -741,6 +867,53 @@
   <footer>PF = points for; PA = points against. Ratings are an independent calculation from LeagueApps results.</footer>
 </main>
 <script>
+  const plot = document.querySelector('.elo-plot');
+  function clearPlotHighlight() {
+    plot.classList.remove('plot-highlight');
+    document.querySelectorAll('#plot .plot-active').forEach(node => node.classList.remove('plot-active'));
+  }
+  document.querySelectorAll('[data-plot-toggle]').forEach(input => {
+    const line = plot.querySelector(`[data-plot-team="${input.dataset.plotToggle}"]`);
+    const legend = input.closest('.plot-legend-item');
+    function highlight() {
+      clearPlotHighlight();
+      legend.classList.add('plot-active');
+      if (input.checked && line) {
+        plot.classList.add('plot-highlight');
+        line.classList.add('plot-active');
+      }
+    }
+    input.addEventListener('change', () => {
+      if (line) line.style.display = input.checked ? '' : 'none';
+      clearPlotHighlight();
+    });
+    legend.addEventListener('pointerenter', highlight);
+    legend.addEventListener('pointerleave', clearPlotHighlight);
+    input.addEventListener('focus', highlight);
+    input.addEventListener('blur', clearPlotHighlight);
+    if (line) {
+      line.addEventListener('pointerenter', highlight);
+      line.addEventListener('pointerleave', clearPlotHighlight);
+    }
+  });
+  function updateNextWeek() {
+    const parts = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Toronto', year:'numeric', month:'2-digit', day:'2-digit'}).formatToParts(new Date());
+    const value = type => parts.find(part => part.type === type).value;
+    const today = new Date(Date.UTC(+value('year'), +value('month') - 1, +value('day')));
+    const daysToMonday = (8 - today.getUTCDay()) % 7 || 7;
+    const start = new Date(today.getTime() + daysToMonday * 86400000);
+    const end = new Date(start.getTime() + 7 * 86400000);
+    const first = start.toISOString().slice(0, 10), last = end.toISOString().slice(0, 10);
+    const format = new Intl.DateTimeFormat('en-CA', {timeZone:'UTC', month:'short', day:'numeric'});
+    document.getElementById('next-week-dates').textContent = `${format.format(start)}–${format.format(new Date(end.getTime() - 86400000))}`;
+    let count = 0;
+    document.querySelectorAll('[data-match-date]').forEach(row => {
+      row.hidden = !(row.dataset.matchDate >= first && row.dataset.matchDate < last);
+      if (!row.hidden) count++;
+    });
+    document.getElementById('next-week-empty').hidden = count > 0;
+  }
+  updateNextWeek();
   function alignSchedules() {
     const panel = document.getElementById('schedule');
     if (panel.hidden) return;
@@ -774,6 +947,7 @@
   }
   function selectTab(tab, updateHistory = true) {
     tabs.forEach(item => { const active = item === tab; item.setAttribute('aria-selected', active); document.getElementById(item.getAttribute('aria-controls')).hidden = !active; });
+    if (tab.id === 'tab-next-week') updateNextWeek();
     alignSchedules();
     if (updateHistory) history.replaceState(currentView(), '', '#' + tab.getAttribute('aria-controls'));
   }
