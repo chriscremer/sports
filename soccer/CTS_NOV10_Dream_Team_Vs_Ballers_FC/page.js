@@ -51,8 +51,8 @@ function element(tag, className, text) {
 
 function seek(seconds, {play = false} = {}) {
   seekTime = Math.max(0, Math.min(match.duration, seconds));
-  if (writeTime) writeTime(seekTime);
   playRequested ||= play;
+  if (writeTime) writeTime(seekTime, playRequested);
   if (playRequested && playVideo) {
     playRequested = false;
     playVideo();
@@ -111,7 +111,10 @@ function media() {
 
 function youtubeMedia(player) {
   if (!match.videoId) return;
-  const options = new URLSearchParams({enablejsapi: 1, playsinline: 1, rel: 0, start: Math.floor(seekTime)});
+  const initialTime = seekTime;
+  const options = new URLSearchParams({
+    enablejsapi: 1, autoplay: 0, playsinline: 1, rel: 0, start: Math.floor(initialTime),
+  });
   if (location.protocol.startsWith("http")) options.set("origin", location.origin);
   const frame = element("iframe");
   frame.title = `${match.title} on YouTube`;
@@ -124,11 +127,19 @@ function youtubeMedia(player) {
     new YT.Player(frame, {
       events: {
         onReady({target}) {
-          readTime = () => target.getCurrentTime() ?? seekTime;
-          writeTime = (time) => target.seekTo(time, true);
+          const waitingToPlay = () => {
+            const state = target.getPlayerState();
+            return state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED;
+          };
+          readTime = () => waitingToPlay() ? seekTime : target.getCurrentTime() ?? seekTime;
+          writeTime = (time, play) => {
+            if (!play && waitingToPlay()) target.cueVideoById({videoId: match.videoId, startSeconds: time});
+            else target.seekTo(time, true);
+          };
           playVideo = () => target.playVideo();
           $("media-status").textContent = "";
-          seek(seekTime);
+          // The iframe is already cued at kickoff. Seeking here can start playback.
+          if (playRequested || seekTime !== initialTime) seek(seekTime);
         },
         onError() {
           $("media-status").textContent = location.protocol === "file:"
