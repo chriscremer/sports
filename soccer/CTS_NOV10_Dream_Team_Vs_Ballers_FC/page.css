@@ -8,6 +8,7 @@
   --mint: #a8f1bc;
   --gold: #ffc86e;
   --away: #9faeff;
+  --content-width: 1376px;
   --lane-label: 110px;
   --lane-duration: 58px;
   font: 15px/1.45 system-ui, -apple-system, sans-serif;
@@ -15,8 +16,11 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; color: var(--ink); background: var(--bg); }
-.public-page { --lane-label: 57px; }
-main { width: min(1376px, calc(100% - 64px)); margin: 0 auto 52px; }
+.public-page {
+  --lane-label: 57px;
+  --content-width: clamp(1376px, calc((100svh - 136px) * 16 / 9), 1920px);
+}
+main { width: min(var(--content-width), calc(100% - 64px)); margin: 0 auto 52px; }
 a { color: var(--mint); text-underline-offset: .23em; }
 a:hover { color: var(--ink); }
 button, select { color: var(--ink); font: inherit; }
