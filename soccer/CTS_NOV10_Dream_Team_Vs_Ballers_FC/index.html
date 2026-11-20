@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soccer match review</title>
+  <link rel="stylesheet" href="page.css">
+  <script defer src="match.js"></script>
+  <!-- developer script -->
+  <script defer src="page.js"></script>
+</head>
+<body class="public-page">
+  <main>
+    <header class="masthead">
+      <div>
+        <p id="match-date" class="muted"></p>
+        <h1 id="match-title"></h1>
+      </div>
+      <div class="match-meta"><strong id="match-score"></strong></div>
+    </header>
+    <section class="screen" aria-label="Match video">
+      <div class="video-column">
+        <div id="viewport" class="viewport">
+          <div id="player"></div>
+        </div>
+        <div class="video-controls">
+          <span id="possession-now" hidden></span>
+          <span id="media-status" role="status"></span>
+        </div>
+      </div>
+    </section>
+    <section class="possession-card" id="possession-card" aria-labelledby="possession-heading" hidden>
+      <div>
+        <h2 id="possession-heading">Possession</h2>
+        <p id="possession-description" class="muted"></p>
+      </div>
+      <div id="possession-teams" class="possession-teams"></div>
+      <div id="possession-share" class="possession-share"></div>
+    </section>
+    <section class="timeline" aria-labelledby="timeline-heading">
+      <div class="timeline-heading">
+        <h2 id="timeline-heading">Match timeline</h2>
+        <span id="focus-label" aria-live="polite"></span>
+        <button id="clear-focus" type="button" hidden>Show all players</button>
+      </div>
+      <div class="axis timeline-axis">
+        <span class="lane-label" id="event-rail-label">Goals</span>
+        <div>
+          <div id="ticks" class="ticks" aria-hidden="true"></div>
+          <div id="event-rail" class="rail event-rail" role="group" aria-labelledby="event-rail-label">
+            <label class="visually-hidden" for="scrub">Seek to video time</label>
+            <input id="scrub" type="range" min="0" value="0" step=".1">
+            <div id="event-markers"></div>
+          </div>
+        </div>
+      </div>
+      <div id="possession-lanes" hidden>
+        <div class="axis">
+          <span class="lane-label">Ball in play</span>
+          <button id="play-state-rail" class="rail state-rail" type="button" aria-label="Seek on the ball-in-play timeline"></button>
+          <span></span>
+        </div>
+        <div class="axis">
+          <span class="lane-label">Possession</span>
+          <button id="possession-rail" class="rail state-rail" type="button" aria-label="Seek on the possession timeline"></button>
+          <span></span>
+        </div>
+        <p id="possession-legend" class="possession-legend"></p>
+      </div>
+      <div id="team-tabs" class="team-tabs" role="tablist" aria-label="Player timelines" hidden></div>
+      <div id="lanes"></div>
+    </section>
+    <!-- developer content -->
+  </main>
+</body>
+</html>
