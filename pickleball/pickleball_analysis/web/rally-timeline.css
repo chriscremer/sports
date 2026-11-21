@@ -1,0 +1,55 @@
+.rally-timeline {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+}
+
+.rally-heading, .rally-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.rally-heading strong { color: var(--white); font-size: 13px; }
+.rally-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; margin: 4px 9px 0 0; }
+.rally-label { font-size: 11px; font-weight: 600; }
+.rally-label small { margin-left: 4px; color: var(--muted); font-size: 10px; }
+.rally-lane { position: relative; height: 26px; color: var(--mint); }
+.rally-lane.far { color: var(--orange); }
+.rally-lane.bounds { color: var(--white); }
+.rally-lane::before { content: ''; position: absolute; inset: 12px 0 auto; height: 2px; background: var(--line); }
+.rally-lane::after { content: ''; position: absolute; left: var(--playhead, 0%); inset-block: 0; width: 1px; background: var(--white); opacity: .7; pointer-events: none; }
+.rally-span { position: absolute; inset: 8px calc(100% - var(--end)) 8px var(--start); border-radius: 4px; background: #5c816f; }
+.rally-mark {
+  position: absolute;
+  z-index: 1;
+  transform: translateX(-50%);
+  top: 1px;
+  left: var(--at);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.rally-mark span { display: grid; place-items: center; width: 16px; height: 16px; background: currentColor; border: 1px solid currentColor; border-radius: 50%; }
+.rally-mark span::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #172220; }
+.rally-mark span { font-size: 0; }
+.rally-mark.approximate span { background: #192022; }
+.rally-mark.approximate span::before { background: currentColor; width: 4px; height: 4px; }
+.rally-mark.bounds span, .bounds .rally-mark span { color: var(--white); font-size: 9px; background: #263d34; border-radius: 4px; }
+.bounds .rally-mark span::before { display: none; }
+.rally-mark:hover span, .rally-mark[aria-current] span { outline: 1px solid var(--white); outline-offset: 2px; }
+.rally-ticks { display: flex; justify-content: space-between; margin-top: 2px; color: var(--muted); font-size: 10px; }
+.rally-footer { margin-top: 6px; }
+#rally-phase { color: var(--white); }

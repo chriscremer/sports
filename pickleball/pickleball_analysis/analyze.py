@@ -9,6 +9,24 @@ from geometry import calibrate,ground,lift_pose
 from tracking import bridge_short_gaps
 
 DEFAULT=Path('/Users/chriscremer/Downloads/pickleball_video_analysis')
+DEMO_CAMERA = {
+    'source': {'id': 'tdGSHF5FseE', 'url': 'https://www.youtube.com/watch?v=tdGSHF5FseE',
+               'title': 'Johns / Tardio vs Alshon / Daescu · PPA Las Vegas Open'},
+    # Far-left, far-right, near-right, near-left. Verified at 00:57 of this broadcast.
+    'corners_normalized': (np.array([[237,105],[409,105],[545,268],[103,268]]) / [640,360]).tolist(),
+    'far_crops_normalized': [[.219,.09,.570,.472],[.484,.09,.836,.472]],
+}
+
+
+def camera_config(path):
+    config = json.loads(path.read_text()) if path else DEMO_CAMERA
+    corners = np.asarray(config['corners_normalized'], dtype=float)
+    if corners.shape != (4, 2) or not np.all((corners >= 0) & (corners <= 1)):
+        raise ValueError('Provide four normalized court corners in image order')
+    for x0, y0, x1, y1 in config.get('far_crops_normalized', []):
+        if not (0 <= x0 < x1 <= 1 and 0 <= y0 < y1 <= 1):
+            raise ValueError('Invalid normalized far-court crop')
+    return config, corners
 
 def overlap(a,b):
     low=np.maximum(a[:2],b[:2]);high=np.minimum(a[2:4],b[2:4]);intersection=np.prod(np.maximum(0,high-low))
@@ -19,8 +37,12 @@ def run(args):
     cap=cv2.VideoCapture(str(data/'source-720p.mp4'))
     if not cap.isOpened(): raise RuntimeError('Download source-720p.mp4 first')
     width,height=int(cap.get(3)),int(cap.get(4)); fps=cap.get(5)
-    # Manually verified court corners at 00:57 of this broadcast, scaled from 640x360.
-    corners=np.array([[237,105],[409,105],[545,268],[103,268]],float)*[width/640,height/360]
+    config, corners_normalized = camera_config(args.camera)
+    if args.camera:
+        corners = corners_normalized * [width, height]
+    else:
+        # Retain the demo's original floating-point calibration for cached results.
+        corners = np.array([[237,105],[409,105],[545,268],[103,268]],float)*[width/640,height/360]
     H,K,R,C,error=calibrate(width,height,corners)
     model=YOLO(str(data/'models/yolo11s-pose.pt'))
     frames=[]; active={}; next_id=1
@@ -34,7 +56,7 @@ def run(args):
         batches=[(result,0,0)]
         # Two overlapping tiles enlarge distant players without cutting off their feet.
         # Include run-off behind the baseline, not just the painted court.
-        for bounds in [[.219,.09,.570,.472],[.484,.09,.836,.472]]:
+        for bounds in config.get('far_crops_normalized', []):
             x0,y0,x1,y1=[round(v*s) for v,s in zip(bounds,[width,height,width,height])]
             far_result=model.predict(img[y0:y1,x0:x1],imgsz=960,conf=.25,device=args.device,verbose=False)[0]
             batches.append((far_result,x0,y0))
@@ -79,7 +101,7 @@ def run(args):
     filled=bridge_short_gaps(frames,K,R,C)
     observed=sum(sum(p['tracking_status']=='detected' for p in f['players']) for f in frames)
     name=f'rally-{args.start:g}'
-    payload={'source':{'id':'tdGSHF5FseE','url':'https://www.youtube.com/watch?v=tdGSHF5FseE','title':'Johns / Tardio vs Alshon / Daescu · PPA Las Vegas Open'},
+    payload={'source':config['source'],
       'clip':{'start':args.start,'end':args.start+len(frames)/args.hz,'hz':args.hz,'width':width,'height':height,'video':f'/media/previews/{name}.mp4'},
       'calibration':{'corners':corners.tolist(),'H':H.tolist(),'K':K.tolist(),'R':R.tolist(),'C':C.tolist(),'reprojection_rmse_px':error},
       'method':{'pose':'YOLO11s-pose with overlapping far-court tiles','tracking':'image-box continuity; same-ID gaps <=0.4s interpolated without endpoint extrapolation','ground':'four manually calibrated court corners','depth':'upright plane approximation; hidden limb depth unobserved','ball':'run track_ball.py for learned ball inference','value':'not trained'},
@@ -117,4 +139,6 @@ def run(args):
     cap.release()
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--data',default=str(DEFAULT));p.add_argument('--start',type=float,default=55);p.add_argument('--duration',type=float,default=11);p.add_argument('--hz',type=float,default=15);p.add_argument('--device',default='mps');p.add_argument('--clip',action='store_true');p.add_argument('--ffmpeg',default='/Users/chriscremer/miniconda3/bin/ffmpeg');run(p.parse_args())
+    p=argparse.ArgumentParser();p.add_argument('--data',default=str(DEFAULT));p.add_argument('--start',type=float,default=55);p.add_argument('--duration',type=float,default=11);p.add_argument('--hz',type=float,default=15);p.add_argument('--device',default='mps');p.add_argument('--clip',action='store_true');p.add_argument('--ffmpeg',default='/Users/chriscremer/miniconda3/bin/ffmpeg')
+    p.add_argument('--camera',type=Path,help='JSON with source metadata and normalized court corners for new footage')
+    run(p.parse_args())

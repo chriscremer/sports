@@ -102,6 +102,7 @@ def main():
     parser.add_argument('--ffmpeg', default='/Users/chriscremer/miniconda3/bin/ffmpeg')
     parser.add_argument('--device', default='mps' if torch.backends.mps.is_available() else 'cpu')
     parser.add_argument('--refresh', action='store_true')
+    parser.add_argument('--clip-start', type=float, action='append', help='Analyzed excerpt start, repeat to include several')
     args = parser.parse_args()
     output = args.data/'comparison'
     output.mkdir(exist_ok=True)
@@ -111,8 +112,12 @@ def main():
     width, height = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     if (width,height) != (1920,1080): raise ValueError(f'Expected genuine 1080p source, got {width}x{height}')
     clips = []
-    for start in [55,75]:
-        original_clip=json.loads((args.data/'analysis'/f'rally-{start}.json').read_text())['clip']
+    sources = []
+    for start in sorted(set(args.clip_start or [55, 75])):
+        clip_id = f'rally-{start:g}'
+        original = json.loads((args.data/'analysis'/f'{clip_id}.json').read_text())
+        original_clip = original['clip']
+        sources.append(original['source'])
         duration=original_clip['end']-original_clip['start']
         first, count = round(start*fps), round(duration*fps)
         cap.set(cv2.CAP_PROP_POS_FRAMES, first)
@@ -120,14 +125,14 @@ def main():
         if not ok: raise RuntimeError('Could not seek source')
         source_start = cap.get(cv2.CAP_PROP_POS_MSEC)/1000
         end=original_clip['end']
-        clip = dict(id=f'rally-{start}', label=f'{start//60:02}:{start%60:02}–{int(end)//60:02}:{end%60:04.1f} · {duration:.1f}s', viewer_start=original_clip['start'], viewer_end=end, original_viewer_video=original_clip['video'], first_frame=first, frame_count=count, source_start=source_start, fps=fps, width=width, height=height, duration=count/fps, video=f'comparison/rally-{start}-1080p.mp4', predictions=f'comparison/rally-{start}-models.json')
+        clip = dict(id=clip_id, label=f'{int(start)//60:02}:{start%60:04.1f}–{int(end)//60:02}:{end%60:04.1f} · {duration:.1f}s', viewer_start=original_clip['start'], viewer_end=end, original_viewer_video=original_clip['video'], first_frame=first, frame_count=count, source_start=source_start, fps=fps, width=width, height=height, duration=count/fps, video=f'comparison/{clip_id}-1080p.mp4', predictions=f'comparison/{clip_id}-models.json')
         preview = args.data/clip['video']
         if args.refresh or not preview.exists():
             # Exact frame-index trim, rather than an approximate keyframe seek.
             subprocess.run([args.ffmpeg,'-hide_banner','-loglevel','error','-y','-i',str(source),'-an','-vf',f'trim=start_frame={first}:end_frame={first+count},setpts=PTS-STARTPTS','-c:v','libx264','-preset','fast','-crf','16','-pix_fmt','yuv420p','-movflags','+faststart',str(preview)], check=True)
         clips.append(clip)
     cap.release()
-    manifest = dict(source=dict(file='source-1080p.mp4', width=width,height=height,fps=fps,url='https://www.youtube.com/watch?v=tdGSHF5FseE',youtube_format='137',note='All inference uses the downloaded original 1920×1080 frames. Browser clips are H.264 previews.'),models=CONFIGS,clips=clips,threshold=0.5,note='Unlabeled experiments. Coverage measures frames with candidates, not localization accuracy. Larger inputs are experimental; every checkpoint was trained at 512×288. No synthetic gap filling or 3D coordinates.')
+    manifest = dict(source=dict(file='source-1080p.mp4', width=width,height=height,fps=fps,url=sources[0].get('url'),note='All inference uses the original 1920×1080 frames. Browser clips are H.264 previews.'),models=CONFIGS,clips=clips,threshold=0.5,note='Unlabeled experiments. Coverage measures frames with candidates, not localization accuracy. Larger inputs are experimental; every checkpoint was trained at 512×288. No synthetic gap filling or 3D coordinates.')
     atomic_json(output/'manifest.json', manifest)
     for clip in clips:
         path = args.data/clip['predictions']

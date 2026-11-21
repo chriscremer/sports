@@ -2,6 +2,8 @@
 
 Local video viewer for https://www.youtube.com/watch?v=tdGSHF5FseE with detected stick figures over the source footage and a synchronized, orbitable 3D court. Code is in this directory. Downloaded video, model weights, tracking JSON, clips, Python environment, and review images live in `/Users/chriscremer/Downloads/pickleball_video_analysis`.
 
+For a new recording, use the [v2 video analysis workflow](VIDEO_ANALYSIS.md).
+
 ## Open the viewer
 
 ```sh
