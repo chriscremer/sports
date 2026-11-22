@@ -1,16 +1,38 @@
 import * as THREE from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
-const $=id=>document.getElementById(id), video=$('video'),canvas=$('overlay'),ctx=canvas.getContext('2d');
+import {createMatchOverlay} from './match-overlay.mjs';
+import {createMotionClock, sampleBridge, samplePlayers, sampleRallyBall, shortFlightBridges} from './reconstruction-motion.mjs';
+import {attachMatchTimeline, matchPlayback} from './match-playback.mjs';
+const $=id=>document.getElementById(id), video=$('video'),canvas=$('overlay'),ctx=canvas?.getContext('2d');
+const matchUrl=document.body.dataset.matchUrl;
+const scrubber=$('timeline');
+let playback=video, updateOverview=null;
 const mediaRoot=new URL(document.body.dataset.mediaBase||'/media/',document.baseURI);
 const mediaURL=path=>new URL(path.replace(/^\/media\//,''),mediaRoot).href;
 const clipsURL=document.body.dataset.clipsUrl||'/api/clips';
 const ballDepthNote=$('ball-depth-note');
-const rallyTimeline=document.querySelector('.rally-timeline');
-const rallyMarkers=[...document.querySelectorAll('[data-rally-frame]')];
+const rallyTimelines=new Map([...document.querySelectorAll('.rally-timeline[data-fps]')].map(lane=>[lane.dataset.rallySection,lane]));
+let rallyTimeline=rallyTimelines.get(undefined), rallyMarkers=[];
+let rallyPhase;
 let rallyDisplayFrame=-1;
+function selectRallyTimeline(next){
+ if(rallyTimeline)rallyTimeline.hidden=true;
+ rallyTimeline=next;
+ if(!next)return;
+ next.hidden=false;
+ rallyMarkers=[...next.querySelectorAll('[data-rally-frame]')];
+ rallyPhase=next.querySelector('[data-rally-phase], #rally-phase');
+ rallyDisplayFrame=-1;
+}
+selectRallyTimeline(rallyTimeline);
 const connections=[[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,1],[0,2],[1,3],[2,4]];
 const colors={near:'#a0eacb',far:'#ffb27f'};
+const matchOverlayCanvas=$('match-source-overlay'), matchOverlayToggle=$('show-match-overlay');
+const drawMatchOverlay=matchOverlayCanvas&&createMatchOverlay(matchOverlayCanvas,connections,colors);
 let data=null,clips=[],frame=null,frameIndex=0,lastDraw=-1,lastBall=-1,lastVideoTime=-1;
+let ballSegments=[],ballBridges=[];
+let lastPoseTime=-1, displayedPlayers=[];
+const motionClock=createMotionClock();
 const scene=new THREE.Scene();scene.background=new THREE.Color('#111b1e');scene.fog=new THREE.Fog('#111b1e',25,65);
 const camera=new THREE.PerspectiveCamera(43,1,.1,100);camera.position.set(10,9,18);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));$('scene').appendChild(renderer.domElement);
@@ -27,97 +49,206 @@ const net=new THREE.Mesh(new THREE.PlaneGeometry(6.4,.914),new THREE.MeshBasicMa
 scene.add(line([[-.15,.914,6.7056],[6.25,.914,6.7056]],'#d8e4df'));
 for(let x=0;x<6.1;x+=.18)scene.add(line([[x,0,6.7056],[x,.91,6.7056]],'#738c88',.3));
 for(let y=.1;y<.9;y+=.12)scene.add(line([[0,y,6.7056],[6.1,y,6.7056]],'#738c88',.3));
-const dynamic=new THREE.Group();scene.add(dynamic);
-const ballMesh=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),new THREE.MeshBasicMaterial({color:'#e3fa68'}));scene.add(ballMesh);ballMesh.visible=false;
-const ballShadow=new THREE.Mesh(new THREE.RingGeometry(.10,.14,24),new THREE.MeshBasicMaterial({color:'#e3fa68',transparent:true,opacity:.5,side:THREE.DoubleSide}));ballShadow.rotation.x=-Math.PI/2;scene.add(ballShadow);ballShadow.visible=false;
-const ballProjection=new THREE.Mesh(new THREE.RingGeometry(.72,1,32),new THREE.MeshBasicMaterial({color:'#e3fa68',side:THREE.DoubleSide,depthTest:false}));
-ballProjection.visible=false;
-ballProjection.renderOrder=3;
-if(ballDepthNote)scene.add(ballProjection);
+const playerTrails=new THREE.Group();scene.add(playerTrails);
+const playerRigs=new Map();
+const limbGeometry=new THREE.CylinderGeometry(.04,.04,1,6);
+const headGeometry=new THREE.SphereGeometry(.085,12,10);
+const footGeometry=new THREE.RingGeometry(.12,.18,24);
+const up=new THREE.Vector3(0,1,0), direction=new THREE.Vector3();
+const ballMesh=new THREE.Mesh(new THREE.SphereGeometry(.12,16,12),new THREE.MeshBasicMaterial({color:'#e3fa68',transparent:true}));scene.add(ballMesh);ballMesh.visible=false;
+const groundBall=matchUrl?new THREE.Mesh(new THREE.RingGeometry(.082,.125,20),new THREE.MeshBasicMaterial({color:'#e3fa68',side:THREE.DoubleSide})):null;
+if(groundBall){groundBall.rotation.x=-Math.PI/2;groundBall.visible=false;scene.add(groundBall)}
+const rippleGeometry=new THREE.RingGeometry(.68,1,32);
+let contactRipples=[];
 let ballTrail=null,ballTrailKey=null;
 const coord=p=>[p[0],p[2],p[1]];
-function disposeDynamic(){while(dynamic.children.length){const o=dynamic.children[0];dynamic.remove(o);o.traverse(n=>{n.geometry?.dispose();if(n.material)n.material.dispose()})}}
-function segment(a,b,color,r=.04){const va=new THREE.Vector3(...a),vb=new THREE.Vector3(...b),dir=vb.clone().sub(va);const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,dir.length(),6),new THREE.MeshBasicMaterial({color}));m.position.copy(va.add(vb).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());dynamic.add(m)}
-function rebuild(f){disposeDynamic();if(!f)return;
- for(const player of f.players){const color=colors[player.team],points=player.joints3d,start=dynamic.children.length;
-  for(const [a,b] of connections)if(points[a]&&points[b])segment(coord(points[a]),coord(points[b]),color);
-  if(points[0]&&points[5]&&points[6]){const shoulders=points[5].map((n,i)=>(n+points[6][i])/2);segment(coord(points[0]),coord(shoulders),color);const head=new THREE.Mesh(new THREE.SphereGeometry(.085,12,10),new THREE.MeshBasicMaterial({color}));head.position.set(...coord(points[0]));dynamic.add(head)}
-  const marker=new THREE.Mesh(new THREE.RingGeometry(.12,.18,24),new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide}));marker.rotation.x=-Math.PI/2;marker.position.set(player.xy[0],.04,player.xy[1]);dynamic.add(marker);
-  if($('trails').checked){const trail=data.frames.slice(Math.max(0,frameIndex-45),frameIndex+1).map(f=>f.players.find(p=>p.id===player.id)).filter(Boolean).map(p=>[p.xy[0],.03,p.xy[1]]);if(trail.length>1)dynamic.add(line(trail,color,.35))}
-  if(player.tracking_status==='interpolated')for(const object of dynamic.children.slice(start)){object.material.transparent=true;object.material.opacity=.55}
+function makePlayerRig(team){
+ const group=new THREE.Group();
+ const material=new THREE.MeshBasicMaterial({color:colors[team],side:THREE.DoubleSide,transparent:true});
+ const limbs=connections.map(()=>new THREE.Mesh(limbGeometry,material));
+ const neck=new THREE.Mesh(limbGeometry,material),head=new THREE.Mesh(headGeometry,material);
+ const feet=new THREE.Mesh(footGeometry,material);feet.rotation.x=-Math.PI/2;
+ group.add(...limbs,neck,head,feet);scene.add(group);
+ return {group,limbs,neck,head,feet,material};
+}
+function setBone(mesh,a,b){
+ mesh.visible=!!(a&&b);
+ if(!mesh.visible)return;
+ direction.set(b[0]-a[0],b[2]-a[2],b[1]-a[1]);
+ const length=direction.length();
+ if(length<1e-6){mesh.visible=false;return}
+ mesh.position.set((a[0]+b[0])/2,(a[2]+b[2])/2,(a[1]+b[1])/2);
+ mesh.quaternion.setFromUnitVectors(up,direction.multiplyScalar(1/length));
+ mesh.scale.y=length;
+}
+function renderPlayers(players){
+ for(const {group} of playerRigs.values())group.visible=false;
+ for(const player of players){
+  const key=`${player.team}-${player.id}`;
+  if(!playerRigs.has(key))playerRigs.set(key,makePlayerRig(player.team));
+  const rig=playerRigs.get(key), points=player.joints3d;
+  rig.group.visible=true;
+  rig.material.opacity=player.opacity??(player.tracking_status==='interpolated'?.55:1);
+  rig.material.depthWrite=rig.material.opacity>.99;
+  for(let i=0;i<connections.length;i++){
+   const [a,b]=connections[i];setBone(rig.limbs[i],points[a],points[b]);
+  }
+  const shoulders=points[5]&&points[6]?points[5].map((value,i)=>(value+points[6][i])/2):null;
+  setBone(rig.neck,points[0],shoulders);
+  rig.head.visible=rig.neck.visible;
+  if(rig.head.visible)rig.head.position.set(...coord(points[0]));
+  rig.feet.position.set(player.xy[0],.04,player.xy[1]);
  }
 }
-function ballAt(t){
- const track=data?.ball_track||[];if(!track.length||t<data.clip.start||t>=data.clip.end)return {observation:null,estimate:null,index:-1};
- let lo=0,hi=track.length;while(lo<hi){const mid=(lo+hi)>>1;if(track[mid].t<t)lo=mid+1;else hi=mid}
- let i=Math.min(lo,track.length-1);if(i>0&&Math.abs(track[i-1].t-t)<Math.abs(track[i].t-t))i--;
- const row=Math.abs(track[i].t-t)<.04?track[i]:null;let estimate=null;
- const baseline=data.ball_segments||[];
- const reviewedSegments=data.ball_review?.additional_segments;
- const segments=reviewedSegments?.length?[...baseline,...reviewedSegments]:baseline;
- for(const s of segments){if(t<s.start||t>s.end)continue;
+function rebuildPlayerTrails(f){
+ for(const old of [...playerTrails.children]){
+  playerTrails.remove(old);old.geometry.dispose();old.material.dispose();
+ }
+ if(!f||!$('trails').checked)return;
+ for(const player of f.players){
+  const trail=[];
+  for(let i=frameIndex;i>=Math.max(0,frameIndex-45);i--){
+   const sample=data.frames[i].players.find(p=>p.id===player.id&&p.team===player.team);
+   if(!sample)break;
+   trail.push([sample.xy[0],.03,sample.xy[1]]);
+  }
+  if(trail.length>1)playerTrails.add(line(trail,colors[player.team],.35));
+ }
+}
+function estimateAt(t){
+ for(const s of ballSegments){if(t<s.start||t>s.end)continue;
   const before=s.support_times.filter(x=>x<=t).at(-1),after=s.support_times.find(x=>x>=t);
   const maxGap=s.max_gap_s??.35,maxDistance=s.max_support_distance_s??.12;
   if((before!==undefined&&after!==undefined&&after-before>maxGap)||Math.min(...s.support_times.map(x=>Math.abs(x-t)))>maxDistance)continue;
   const k=s.drag_per_second,dt=t-s.start,d=s.end-s.start,f=-Math.expm1(-k*dt)/k,end=-Math.expm1(-k*d)/k,g=[0,0,-9.81];
   const v=s.p0.map((p,j)=>(s.p1[j]-p-g[j]*(d-end)/k)/end);const xyz=s.p0.map((p,j)=>p+f*v[j]+g[j]*(dt-f)/k);
+  if(!canvas)return {xyz,height:xyz[2],error:s.reprojection_rmse_px};
   const {K,R,C}=data.calibration;const cam=R.map(r=>r.reduce((sum,n,j)=>sum+n*(xyz[j]-C[j]),0));
   const pixel=[K[0][0]*cam[0]/cam[2]+K[0][2],K[1][1]*cam[1]/cam[2]+K[1][2]];
-  estimate={xyz,pixel,height:xyz[2],error:s.reprojection_rmse_px};break;
+  return {xyz,pixel,height:xyz[2],error:s.reprojection_rmse_px};
  }
- const observation=row?.ball||null;
- return {observation,estimate,index:row?i:-1};
+ return null;
 }
-function groundProjection(pixel){
- const [x,y]=pixel;
- const [u,v,w]=data.calibration.H.map(row=>row[0]*x+row[1]*y+row[2]);
- if(Math.abs(w)<1e-8)return null;
- const ground=[u/w,v/w];
- return ground.every(Number.isFinite)?ground:null;
+function ballAt(t){
+ const track=data?.ball_track||[];if(!track.length||t<data.clip.start||t>=data.clip.end)return {observation:null,estimate:null,index:-1};
+ let lo=0,hi=track.length;while(lo<hi){const mid=(lo+hi)>>1;if(track[mid].t<t)lo=mid+1;else hi=mid}
+ let i=Math.min(lo,track.length-1);if(i>0&&Math.abs(track[i-1].t-t)<Math.abs(track[i].t-t))i--;
+ const row=Math.abs(track[i].t-t)<.04?track[i]:null;
+ return {observation:row?.ball||null,estimate:estimateAt(t),index:row?i:-1};
 }
-function renderBall(ball,t){
- const show=$('show-ball').checked&&!!ball.estimate;ballMesh.visible=ballShadow.visible=show;
- if(show){const p=ball.estimate.xyz;ballMesh.position.set(...coord(p));ballShadow.position.set(p[0],.035,p[1]);}
+const rippleStyles={
+ bounce:{color:'#e3fa68',label:'Ground bounce'},
+ volley:{color:'#ff88d0',label:'Volley · pink ripple'},
+ serve:{color:'#91dbe9',label:'Serve'},
+ hit:{color:'#91dbe9',label:'Paddle contact'},
+ turn:{color:'#e0e7ef',label:'Estimated direction change'},
+};
+function setContactRipples(review){
+ for(const {mesh} of contactRipples){scene.remove(mesh);mesh.material.dispose()}
+ const events=review.ripples||[...(review.bounces||[]).map(({t,xy})=>({t,xyz:[...xy,.017],kind:'bounce'})),
+  ...(review.volleys||[]).map(event=>({...event,kind:'volley'}))];
+ contactRipples=[];
+ for(const {t,xyz,kind,approximate} of events){
+  const position=xyz||sampleRallyBall(data.ball_playback,t)?.xyz;
+  if(!position)continue;
+  const {color,label}=rippleStyles[kind];
+  const material=new THREE.MeshBasicMaterial({color,transparent:true,depthWrite:false,side:THREE.DoubleSide});
+  const mesh=new THREE.Mesh(rippleGeometry,material);
+  mesh.rotation.x=-Math.PI/2;
+  mesh.position.set(...coord(position));
+  mesh.visible=false;
+  scene.add(mesh);
+  contactRipples.push({t,mesh,kind,label:approximate&&kind!=='volley'?`Approximate ${label.toLowerCase()}`:label});
+ }
+}
+function renderContactRipples(time,enabled){
+ let active=null;
+ for(const event of contactRipples){
+  const {t,mesh,kind}=event;
+  const progress=(time-t)/.4;
+  mesh.visible=enabled&&progress>=0&&progress<1;
+  if(!mesh.visible)continue;
+  if(!active||kind==='volley'||active.kind!=='volley'&&t>active.t)active=event;
+  const fade=1-progress;
+  mesh.scale.setScalar(.065+.285*(1-fade**2));
+  mesh.material.opacity=.92*Math.sqrt(fade);
+ }
+ return active?.label;
+}
+function renderBall(ball,t,motionTime,sample){
+ const enabled=$('show-ball').checked;
+ const contact=renderContactRipples(motionTime,enabled);
+ const continuous=Boolean(data.ball_playback);
+ const fit=continuous?null:motionTime===t?ball.estimate:estimateAt(motionTime);
+ const position=enabled?(continuous?sample?.xyz:fit?.xyz||sampleBridge(ballBridges,motionTime)):null;
+ ballMesh.visible=!!position;
+ if(position){
+  ballMesh.position.set(...coord(position));
+  ballMesh.material.opacity=sample?.predicted ? .65 : 1;
+ }
+ const projection=enabled&&!continuous&&!position?ball.observation?.ground_xy:null;
+ if(groundBall){
+  groundBall.visible=!!projection;
+  if(projection)groundBall.position.set(projection[0],.035,projection[1]);
+ }
  if(ballDepthNote){
-  const projection=$('show-ball').checked&&!show&&ball.observation?groundProjection(ball.observation.pixel):null;
-  ballProjection.visible=!!projection;
-  if(projection){
-   ballProjection.position.set(projection[0],.05,projection[1]);
-   ballProjection.quaternion.copy(camera.quaternion);
-   const viewHeight=2*camera.position.distanceTo(ballProjection.position)*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-   ballProjection.scale.setScalar(viewHeight*8/Math.max(1,renderer.domElement.clientHeight));
-  }
-  ballDepthNote.textContent=show?'Estimated ball flight':projection?'2D ball projection · height unknown':$('show-ball').checked?'No ball position at this time':'Ball display off';
+  ballDepthNote.textContent=!enabled?'Ball display off':contact|| (sample?.predicted?'Predicted ball position':sample||fit?'Estimated ball flight':position?'Interpolated ball position':projection?'Ground projection · height unknown':continuous?'Between rallies':ball.observation?'Ball visible in video · height unknown':'No ball position at this time');
  }
- const key=`${data.clip.start}-${ball.index}-${show}-${$('trails').checked}`;
+ const show=!!position;
+ const trailIndex=sample?`${sample.rally.start}:${sample.index}`:ball.index;
+ const key=`${data.clip.start}-${trailIndex}-${show}-${$('trails').checked}`;
  if(key!==ballTrailKey){
   if(ballTrail){scene.remove(ballTrail);ballTrail.geometry.dispose();ballTrail.material.dispose();ballTrail=null}
   if(show&&$('trails').checked){
-   const recent=data.ball_track.filter(r=>r.t>=t-.6&&r.t<=t);
-   const points=[coord(ball.estimate.xyz)];
-   for(const row of recent.reverse()){
-    const position=row.reconstruction||row.review_reconstruction;
-    if(!position)break;
-    points.push(coord(position.xyz));
+   const points=[coord(position)];
+   if(sample){
+    const rows=sample.rally.samples;
+    for(let i=sample.index;i>=0&&rows[i][0]>=motionTime-.6;i--)points.push(coord(rows[i].slice(1,4)));
+   }else{
+    const recent=data.ball_track.filter(r=>r.t>=t-.6&&r.t<=t);
+    for(const row of recent.reverse()){
+     const position=row.reconstruction||row.review_reconstruction;
+     if(!position)break;
+     points.push(coord(position.xyz));
+    }
    }
-   if(points.length>1){ballTrail=line(points,'#e3fa68',.7);scene.add(ballTrail)}
+   if(points.length>1){ballTrail=line(points,'#e3fa68',.7);ballTrail.frustumCulled=false;scene.add(ballTrail)}
   }
   ballTrailKey=key;
  }
- $('ball-status').textContent=ball.estimate?`${ball.estimate.height.toFixed(2)} m`:ball.observation?'2D only':'Unknown';
+ if(show&&ballTrail){
+  const vertices=ballTrail.geometry.attributes.position;
+  vertices.setXYZ(0,...coord(position));vertices.needsUpdate=true;
+ }
+ $('ball-status').textContent=sample?`${sample.predicted?'≈ ':''}${sample.xyz[2].toFixed(2)} m`:ball.estimate?`${ball.estimate.height.toFixed(2)} m`:ball.observation?'2D only':'Unknown';
  const reviewed=ball.observation?.tracking_status==='reviewed';
- $('ball-detail').textContent=reviewed?'Ball center reviewed in the source frame.':ball.estimate?`Estimated flight · ${ball.observation?'model detection':'gap filled by flight fit'} · ${ball.estimate.error.toFixed(1)} px fit RMS`:ball.observation?'TrackNet detected the ball. No supported height estimate at this time.':'No supported ball track at this time.';
+ $('ball-detail').textContent=sample?.predicted?'Position predicted from nearby ball flights, detections and contacts.':reviewed?'Ball center reviewed in the source frame.':ball.estimate?`Estimated flight · ${ball.observation?'model detection':'gap filled by flight fit'} · ${ball.estimate.error.toFixed(1)} px fit RMS`:sample?'Position follows a supported flight.':ball.observation?'TrackNet detected the ball. No supported height estimate at this time.':'No supported ball track at this time.';
 }
-function currentTime(){return video.currentTime+(data?.clip.start||0)}
+function currentTime(){return playback.currentTime+(data?.clip.start||0)}
 function fmt(t,ms=false){return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}${ms?'.'+String(Math.floor(t%1*1000)).padStart(3,'0'):''}`}
-function findFrame(t){if(!data||t<data.clip.start||t>=data.clip.end)return null;frameIndex=Math.min(data.frames.length-1,Math.max(0,Math.round((t-data.clip.start)*data.clip.hz)));const f=data.frames[frameIndex];return Math.abs(f.t-t)<.12?f:null}
+function poseIndex(t){
+ if(t<data.clip.start||t>=data.clip.end)return -1;
+ if(matchUrl){
+  const window=data.camera_windows.find(({start,end})=>start<=t&&t<end);
+  if(!window)return -1;
+  let lo=0,hi=data.frames.length;
+  while(lo<hi){const mid=(lo+hi)>>1;if(data.frames[mid].t<t)lo=mid+1;else hi=mid}
+  const valid=[lo-1,lo].filter(index=>{
+   const frame=data.frames[index];
+   return frame&&frame.t>=window.start-.000001&&frame.t<window.end&&Math.abs(frame.t-t)<=1.1/data.clip.hz;
+  });
+  return valid.sort((a,b)=>Math.abs(data.frames[a].t-t)-Math.abs(data.frames[b].t-t))[0]??-1;
+ }
+ const index=Math.min(data.frames.length-1,Math.max(0,Math.round((t-data.clip.start)*data.clip.hz)));
+ return data.frames[index]&&Math.abs(data.frames[index].t-t)<.12?index:-1;
+}
 // Composite decoded footage and detections together: the embedded browser can
 // lose its separate video presentation layer while continuing to decode frames.
 function drawOverlay(f,ball){
  const width=data?.clip.width||1280,height=data?.clip.height||720;
  if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height}
  ctx.clearRect(0,0,width,height);ctx.shadowBlur=0;ctx.setLineDash([]);
- if(video.readyState>=2)ctx.drawImage(video,0,0,width,height);
+ ctx.drawImage(video,0,0,width,height);
  if(!f)return;
  if($('show-pose').checked)for(const p of f.players){const k=p.keypoints;ctx.strokeStyle=colors[p.team];ctx.fillStyle=colors[p.team];ctx.lineWidth=3;ctx.shadowColor='#000';ctx.shadowBlur=2;ctx.setLineDash(p.tracking_status==='interpolated'?[6,4]:[]);
   for(const [a,b] of connections)if(k[a][2]>.2&&k[b][2]>.2){ctx.beginPath();ctx.moveTo(k[a][0],k[a][1]);ctx.lineTo(k[b][0],k[b][1]);ctx.stroke()}
@@ -138,13 +269,14 @@ function metrics(f){$('count').innerHTML=`${f?.players.length??'—'} <small>/ 4
  const near=ps.filter(p=>p.team==='near'),far=ps.filter(p=>p.team==='far');const dist=(p,near)=>Math.abs(p.xy[1]-(near?8.8392:4.572));const mean=(arr,near)=>arr.reduce((s,p)=>s+dist(p,near),0)/arr.length;
  $('near-distance').textContent=near.length?`${mean(near,true).toFixed(2)} m`:'—';$('far-distance').textContent=far.length?`${mean(far,false).toFixed(2)} m`:'—';
  const index=near.length===2&&far.length===2&&!filled?Math.round(50+Math.max(-50,Math.min(50,(mean(far,false)-mean(near,true))*8))):null;$('index').textContent=index??'—';$('score-bar').style.width=(index??0)+'%';
- $('notice').textContent=!f?'No reconstruction at this time. Choose an analyzed excerpt to compare observed poses.':`${fmt(f.t)} in original match · ${ps.length}/4 players tracked${filled?` · ${filled} short gap interpolated (dashed overlay)`:''} · Body depth approximated · Ball height estimated only on reviewed flights`;$('notice').classList.toggle('warning',!f||ps.length!==4||filled>0);
+ $('notice').textContent=!f?(matchUrl?'No player reconstruction at this time.':'No reconstruction at this time. Choose an analyzed excerpt to compare observed poses.'):`${fmt(f.t)} in original match · ${ps.length}/4 players tracked${filled?` · ${filled} short gap interpolated (dashed overlay)`:''} · Body depth approximated · ${data.ball_playback?'Ball height fitted or predicted during rallies':'Ball height estimated only on reviewed flights'}`;$('notice').classList.toggle('warning',!f||ps.length!==4||filled>0);
 }
 function updateRallyTimeline(clipTime){
  if(!rallyTimeline)return;
- const {fps,duration,startFrame,endFrame}=rallyTimeline.dataset;
- rallyTimeline.style.setProperty('--playhead',`${Math.min(100,100*clipTime/Number(duration))}%`);
- const frame=Math.floor(clipTime*Number(fps));
+ const {fps,duration,offset,startFrame,endFrame}=rallyTimeline.dataset;
+ const relative=clipTime-Number(offset||0);
+ rallyTimeline.style.setProperty('--playhead',`${Math.max(0,Math.min(100,100*relative/Number(duration)))}%`);
+ const frame=Math.floor(relative*Number(fps));
  if(frame===rallyDisplayFrame)return;
  rallyDisplayFrame=frame;
  const active=rallyMarkers.filter(marker=>Number(marker.dataset.rallyFrame)===frame);
@@ -152,32 +284,81 @@ function updateRallyTimeline(clipTime){
   if(active.includes(marker))marker.setAttribute('aria-current','true');
   else marker.removeAttribute('aria-current');
  }
- $('rally-phase').textContent=active.at(-1)?.dataset.rallyLabel||
+ rallyPhase.textContent=active.at(-1)?.dataset.rallyLabel||
   (frame<Number(startFrame)?'Before serve':frame>Number(endFrame)?'Rally over':'In play');
 }
-function update(force=false){const t=currentTime();frame=findFrame(t);const ballTime=data?.ball_review?data.ball_review.source_start+video.currentTime:t;
- const i=frame?frameIndex:-1,ball=ballAt(ballTime);if(force||i!==lastDraw){rebuild(frame);metrics(frame)}if(force||i!==lastDraw||ball.index!==lastBall||video.currentTime!==lastVideoTime){drawOverlay(frame,ball);lastBall=ball.index;lastVideoTime=video.currentTime}lastDraw=i;renderBall(ball,ballTime);
- $('source-time').textContent=fmt(ballTime,true);$('clip-time').textContent=`${fmt(video.currentTime)} / ${fmt(Number.isFinite(video.duration)?video.duration:0)}`;$('timeline').value=video.currentTime;
- updateRallyTimeline(video.currentTime);
- $('overlay-label').style.display=$('show-pose').checked&&frame?'':'none';$('scene-note').textContent=frame?'Drag to orbit · Scroll to zoom':'No analyzed pose at this time';
+function update(force=false,now=performance.now()){
+ if(!data)return;
+ const t=currentTime(), clipTime=playback.currentTime;
+ if(matchUrl&&clipTime>=playback.duration&&!playback.paused)playback.pause();
+ const ballStart=data.ball_review?.source_start??data.clip.start,ballTime=ballStart+clipTime;
+ const running=!force&&!playback.paused&&!playback.seeking&&playback.readyState>=3;
+ const fps=data.ball_review?.fps||data.ball_summary?.source_hz||30;
+ const smoothTime=Math.min(playback.duration||Infinity,motionClock(clipTime,now,playback.playbackRate,running,1/fps));
+ const poseTime=data.clip.start+smoothTime;
+ const ballMotionTime=ballStart+smoothTime;
+ frameIndex=poseIndex(t);frame=data.frames[frameIndex]||null;
+ const ball=ballAt(ballTime);
+ const sample=data.ball_playback?sampleRallyBall(data.ball_playback,ballTime,ballMotionTime):null;
+ if(force||frameIndex!==lastDraw){rebuildPlayerTrails(frame);metrics(frame)}
+ if(force||poseTime!==lastPoseTime){
+  displayedPlayers=samplePlayers(data.frames,poseIndex(poseTime),poseTime,data.clip.hz);
+  renderPlayers(displayedPlayers);lastPoseTime=poseTime;
+ }
+ const frameReady=canvas&&video.readyState>=2&&!video.seeking;
+ if(frameReady&&(force||frameIndex!==lastDraw||ball.index!==lastBall||clipTime!==lastVideoTime)){
+  drawOverlay(frame,ball);lastBall=ball.index;lastVideoTime=clipTime;
+ }
+ lastDraw=frameIndex;renderBall(ball,ballTime,ballMotionTime,sample);
+ if(drawMatchOverlay)drawMatchOverlay(data.source_projection,ballTime,displayedPlayers,$('show-ball').checked?sample:null,
+  matchOverlayToggle.checked&&playback.hasFrame,force||poseTime!==t);
+ $('source-time').textContent=fmt(ballTime,true);$('clip-time').textContent=`${fmt(clipTime)} / ${fmt(Number.isFinite(playback.duration)?playback.duration:0)}`;
+ if(scrubber)scrubber.value=clipTime;
+ $('play').textContent=playback.paused?'▶ Play':'Ⅱ Pause';
+ if(updateOverview){
+  const analyzed=updateOverview(clipTime);
+  const next=analyzed==null?undefined:rallyTimelines.get(String(analyzed));
+  if(next!==rallyTimeline)selectRallyTimeline(next);
+ }
+ updateRallyTimeline(clipTime);
+ if(canvas)$('overlay-label').style.display=$('show-pose').checked&&frame?'':'none';
+ $('scene-note').textContent=frame?'Drag to orbit · Scroll to zoom':matchUrl?'Player reconstruction unavailable at this time':'No analyzed pose at this time';
 }
-function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera);if(data)update()};animate();
+function animate(now){requestAnimationFrame(animate);controls.update();update(false,now);renderer.render(scene,camera)}
+requestAnimationFrame(animate);
 new ResizeObserver(()=>{const rect=$('scene').getBoundingClientRect();renderer.setSize(rect.width,rect.height);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix()}).observe($('scene'));
-async function loadClip(url){video.pause();data=await fetch(url).then(r=>{if(!r.ok)throw Error('Tracking file unavailable');return r.json()});lastDraw=lastBall=-2;video.src=mediaURL(data.clip.video);video.load();$('dataset-info').textContent=`Pose ${data.clip.hz} Hz · Ball ${data.ball_summary?.source_hz.toFixed(2)||'—'} Hz · TrackNet-Pickleball`;$('coverage').textContent=data.ball_summary?`${data.ball_summary.detected_frames}/${data.ball_summary.total_frames} frames have model detections. ${data.ball_summary.reconstructed_frames||0} frames have estimated height. Coverage is not an accuracy score.`:'Run the ball tracker for this excerpt.';update(true)}
+async function loadClip(url){
+ video.pause();data=await fetch(url).then(r=>{if(!r.ok)throw Error('Tracking file unavailable');return r.json()});
+ ballSegments=[...(data.ball_segments||[]),...(data.ball_review?.additional_segments||[])].sort((a,b)=>a.start-b.start);
+ const contacts=(data.ball_events?.events||[]).map(event=>event.t);
+ for(const event of data.ball_review?.rally_events?.events||[])contacts.push(event.source_seconds);
+ ballBridges=shortFlightBridges(ballSegments,contacts);
+ setContactRipples(data.ball_review||{});
+ lastDraw=lastBall=-2;
+ if(matchUrl){
+  playback=matchPlayback(video,data.source,data.clip.end,()=>update(true));
+  updateOverview=attachMatchTimeline(data,time=>{playback.currentTime=time;update(true)});
+ }else{video.src=mediaURL(data.clip.video);video.load()}
+ $('dataset-info').textContent=`Pose ${data.clip.hz} Hz · Ball ${data.ball_summary?.source_hz.toFixed(2)||'—'} Hz · ${data.ball_summary?.model||'TrackNet-Pickleball'}`;
+ if($('coverage'))$('coverage').textContent=data.ball_summary?`${data.ball_summary.detected_frames}/${data.ball_summary.total_frames} frames have model detections. ${data.ball_summary.reconstructed_frames||0} frames have estimated height. Coverage is not an accuracy score.`:'Run the ball tracker for this excerpt.';
+ update(true);
+}
 video.addEventListener('loadeddata',()=>update(true));
-video.addEventListener('loadedmetadata',()=>{$('timeline').max=video.duration;update(true)});video.addEventListener('seeked',()=>update(true));video.addEventListener('play',()=>{$('play').textContent='Ⅱ Pause'});video.addEventListener('pause',()=>{$('play').textContent='▶ Play'});video.addEventListener('ended',()=>{if($('loop').checked){video.currentTime=0;video.play().catch(()=>{})}});video.addEventListener('error',()=>{$('notice').textContent='Video failed to load. Check that the local media server is running.'});
-$('mute').onclick=()=>{video.muted=!video.muted;$('mute').textContent=video.muted?'Unmute':'Mute';$('mute').setAttribute('aria-pressed',String(video.muted))};
-$('fullscreen').onclick=()=>{const stage=video.closest('.video-stage');if(document.fullscreenElement)document.exitFullscreen();else stage.requestFullscreen().catch(showError)};
-$('play').onclick=()=>video.paused?video.play().catch(e=>{$('notice').textContent=e.message}):video.pause();$('timeline').oninput=e=>{video.currentTime=+e.target.value;update(true)};$('speed').onchange=e=>video.playbackRate=+e.target.value;
-for(const [id,d] of [['back',-1],['next',1]])$(id).onclick=()=>{if(!data)return;video.pause();const rate=data.ball_review?.fps||data.clip.hz;video.currentTime=Math.max(0,Math.min(video.duration,video.currentTime+d/rate));update(true)};
-for(const id of ['show-pose','show-ball','trails'])$(id).onchange=()=>update(true);
+video.addEventListener('loadedmetadata',()=>{if(scrubber)scrubber.max=playback.duration;update(true)});video.addEventListener('seeked',()=>update(true));video.addEventListener('ended',()=>{if($('loop')?.checked){video.currentTime=0;video.play().catch(()=>{})}});video.addEventListener('error',()=>{$('notice').textContent='Video failed to load. Check that the local media server is running.'});
+if($('mute'))$('mute').onclick=()=>{video.muted=!video.muted;$('mute').textContent=video.muted?'Unmute':'Mute';$('mute').setAttribute('aria-pressed',String(video.muted))};
+if($('fullscreen'))$('fullscreen').onclick=()=>{const stage=video.closest('.video-stage');if(document.fullscreenElement)document.exitFullscreen();else stage.requestFullscreen().catch(showError)};
+$('play').onclick=()=>playback.paused?playback.play().catch(e=>{$('notice').textContent=e.message}):playback.pause();
+if(scrubber)scrubber.oninput=e=>{playback.currentTime=+e.target.value;update(true)};
+$('speed').onchange=e=>playback.playbackRate=+e.target.value;
+for(const [id,d] of [['back',-1],['next',1]])$(id)?.addEventListener('click',()=>{if(!data)return;playback.pause();const rate=data.ball_review?.fps||data.clip.hz;playback.currentTime=Math.max(0,Math.min(playback.duration,playback.currentTime+d/rate));update(true)});
+for(const id of ['show-pose','show-ball','trails','show-match-overlay'])if($(id))$(id).onchange=()=>update(true);
 for(const button of document.querySelectorAll('[data-review-seek]')){
- button.onclick=()=>{if(!data||video.readyState<1)return;video.pause();video.currentTime=Number(button.dataset.reviewSeek);};
+ button.onclick=()=>{if(!data||(!matchUrl&&video.readyState<1))return;playback.pause();playback.currentTime=Number(button.dataset.reviewSeek);update(true);};
 }
 for(const [id,pos] of [['perspective',[10,9,18]],['top',[3.048,21,6.71]],['side',[21,5,6.7]]])$(id).onclick=()=>{camera.position.set(...pos);controls.target.set(3.048,0,6.7);controls.update();for(const n of ['perspective','top','side'])$(n).classList.toggle('active',id===n)};
 function showError(e){$('notice').textContent=e.message;$('notice').classList.add('warning')}
 try{
- const reviewURL=document.body.dataset.reviewUrl;
+ const reviewURL=matchUrl||document.body.dataset.reviewUrl;
  if(reviewURL){await loadClip(reviewURL)}
  else{
   clips=await fetch(clipsURL).then(r=>{if(!r.ok)throw Error('Clip list unavailable');return r.json()});

@@ -1,0 +1,33 @@
+.match-main { max-width: none; display: grid; gap: 16px; }
+.match-panels { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; gap: 16px; }
+.match-main [hidden] { display: none; }
+.match-main h1 { margin: 0; font-size: 20px; letter-spacing: -.2px; }
+.match-source { position: relative; }
+.match-player { aspect-ratio: 16/9; min-height: 200px; background: #0c1011; }
+.match-player iframe, .match-player video { display: block; border: 0; width: 100%; height: 100%; }
+.match-player video, #match-source-overlay { object-fit: contain; }
+#match-source-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.match-media-actions { display: flex; flex-wrap: wrap; padding: 8px 14px; min-height: 36px; align-items: center; gap: 8px 12px; font-size: 11px; color: var(--muted); }
+.match-media-actions label { color: var(--white); white-space: nowrap; }
+.match-media-actions button { margin-left: auto; padding: 5px 8px; white-space: nowrap; }
+.match-court { min-height: 200px; }
+.match-depth { top: auto; left: auto; right: 12px; bottom: 12px; font-size: 10px; letter-spacing: normal; }
+.match-main .rally-timeline, .match-transport { margin: 0; }
+.match-hit-details { display: grid; }
+.match-hit-details > .rally-timeline { grid-area: 1 / 1; }
+/* Overlay the panels so every state reserves the tallest detail panel's height. */
+.match-hit-details > [hidden] { display: block; visibility: hidden; }
+.match-hit-details:has([data-rally-section]:not([hidden])) > .match-hits-empty { visibility: hidden; }
+#match-rally-state { color: var(--white); }
+.match-transport { border: 0; padding: 8px 0; }
+.match-lanes { display: grid; grid-template-columns: 82px minmax(0, 1fr); column-gap: 8px; align-items: center; font-size: 11px; }
+.match-rail { position: relative; height: 24px; cursor: pointer; }
+.match-rail::before { content: ''; position: absolute; inset: 8px 0; border-radius: 4px; background: var(--line); }
+.match-rail::after { content: ''; position: absolute; left: var(--match-playhead, 0%); inset-block: 0; width: 1px; background: var(--white); pointer-events: none; }
+.match-span { position: absolute; top: 4px; height: 16px; padding: 0; border: 1px solid transparent; border-radius: 3px; background: #386e60; }
+#review-lane .match-span { background: #a36d45; }
+.match-span:hover, .match-span:focus-visible { border-color: var(--white); background: #568e7c; z-index: 1; }
+#review-lane .match-span:hover, #review-lane .match-span:focus-visible { background: #cf9466; }
+.match-main .notice { padding-block: 0; min-height: 0; }
+.match-main .metrics { margin: 0; }
+@media(max-width: 720px) { .match-panels { grid-template-columns: 1fr; } }

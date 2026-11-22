@@ -2,7 +2,7 @@
 from html import escape
 
 
-def rally_timeline(review, clip):
+def rally_timeline(review, clip, time_offset=0, *, heading='Rally timeline', section=None):
     events = review['events']
     if review['clip'] != clip['id'] or len(events) < 2:
         raise ValueError('Rally review must describe this clip and include its boundaries')
@@ -29,13 +29,19 @@ def rally_timeline(review, clip):
     def position(frame):
         return 100 * frame / fps / duration
 
+    def time_label(seconds):
+        if not time_offset:
+            return f'{seconds:.2f}s'
+        time = time_offset + seconds
+        return f'{int(time) // 60}:{time % 60:05.2f}'
+
     def marker(event, name, symbol):
         frame = event['frame']
         low, high = event['frame_interval']
         uncertain = high - low > 1
-        text = f'{name} · {frame / fps:.2f}s' + (' · approximate' if uncertain else '')
+        text = f'{name} · {time_label(frame / fps)}' + (' · approximate' if uncertain else '')
         hint = escape(f"{text}. {event['evidence']}", quote=True)
-        seek = (frame + .15) / fps
+        seek = time_offset + (frame + .15) / fps
         marker_class = 'rally-mark approximate' if uncertain else 'rally-mark'
         return (f'<button type="button" class="{marker_class}" style="--at:{position(frame):.5f}%" '
                 f'data-rally-frame="{frame}" data-rally-label="{escape(text, quote=True)}" '
@@ -55,13 +61,15 @@ def rally_timeline(review, clip):
                      f'<div class="rally-lane {team}">{marks}</div>')
 
     mid = duration / 2
-    ticks = f'<span>0s</span><span>{mid:.1f}s</span><span>{duration:.1f}s</span>'
+    times = [time_label(t) for t in (0, mid, duration)] if time_offset else ['0s', f'{mid:.1f}s', f'{duration:.1f}s']
+    ticks = ''.join(f'<span>{t}</span>' for t in times)
     return (
         f'<section class="rally-timeline" aria-label="Rally events" data-fps="{fps}" '
-        f'data-duration="{duration}" data-start-frame="{start}" data-end-frame="{end}">'
-        '<div class="rally-heading"><strong>Rally timeline</strong>'
-        f'<span>{start / fps:.2f}s start · {end / fps:.2f}s end</span></div>'
+        f'data-duration="{duration}" data-offset="{time_offset}" data-start-frame="{start}" data-end-frame="{end}"'
+        + (f' data-rally-section="{section}" hidden' if section is not None else '')
+        + f'><div class="rally-heading"><strong>{escape(heading)}</strong>'
+        f'<span>{time_label(start / fps)} start · {time_label(end / fps)} end</span></div>'
         f'<div class="rally-grid">{"".join(lanes)}<div></div><div class="rally-ticks">{ticks}</div></div>'
-        '<div class="rally-footer"><span id="rally-phase">Before serve</span>'
+        '<div class="rally-footer"><span data-rally-phase>Before serve</span>'
         '<span>Click a marker to seek · outlined markers are approximate</span></div></section>\n'
     )

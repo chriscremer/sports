@@ -5,9 +5,11 @@ from scipy.optimize import least_squares
 
 WIDTH, LENGTH = 6.096, 13.4112
 
-def calibrate(width, height, corners):
+def calibrate(width, height, corners, court_points=None):
     # Coordinates: x across court, y from far baseline, z upwards; metres.
-    world = np.array([[0,0,0],[WIDTH,0,0],[WIDTH,LENGTH,0],[0,LENGTH,0]], dtype=float)
+    if court_points is None:
+        court_points = [[0,0],[WIDTH,0],[WIDTH,LENGTH],[0,LENGTH]]
+    world = np.column_stack((np.asarray(court_points, dtype=float), np.zeros(4)))
     pixels = np.array(corners, dtype=float)
     H = cv2.getPerspectiveTransform(pixels.astype('float32'), world[:,:2].astype('float32'))
     # Focal length is an assumption: a single planar view does not fully calibrate it.

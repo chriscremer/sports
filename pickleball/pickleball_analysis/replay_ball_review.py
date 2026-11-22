@@ -7,7 +7,10 @@ from html import escape
 from pathlib import Path
 from urllib.parse import urlsplit
 
+import numpy as np
+
 from ball_geometry import fit_flights, sample_segment
+from geometry import ground
 from rally_timeline import rally_timeline
 
 
@@ -42,6 +45,37 @@ def fit_review_windows(track, aligned, calibration, windows, first_allowed_time)
                            method='Approximate monocular flight with visually reviewed intervals and height priors')
             segments.append(segment)
     return segments
+
+
+def bounce_locations(replay, clip, aligned, windows, additional, reviewed):
+    """Use fitted bounce endpoints or a reviewed pixel at court contact."""
+    baseline_events = replay.get('ball_events', {}).get('events', [])
+    times = [event['t'] for event in baseline_events if event['kind'] == 'bounce']
+    times.extend(aligned[anchor['frame']]['t'] for window in windows for anchor in window['anchors']
+                 if anchor['kind'] == 'bounce')
+    segments = replay.get('ball_segments', []) + additional
+    bounces = []
+    for time in sorted(set(times)):
+        for segment in segments:
+            endpoint = next((key for boundary, key in [('start', 'p0'), ('end', 'p1')]
+                             if abs(segment[boundary] - time) < 1e-6), None)
+            if endpoint and abs(segment[endpoint][2] - .037) < .06:
+                bounces.append({'t': time, 'xy': segment[endpoint][:2], 'method': 'fitted bounce'})
+                break
+
+    H = np.asarray(replay['calibration']['H'])
+    scale = [replay['clip']['width'] / clip['width'], replay['clip']['height'] / clip['height']]
+    for event in reviewed:
+        frame, pixel = event['frame'], event['ground_pixel_1080p']
+        if frame not in aligned or not (0 <= pixel[0] < clip['width'] and 0 <= pixel[1] < clip['height']):
+            raise ValueError(f'Invalid reviewed ground contact at frame {frame}')
+        time = clip['source_start'] + frame / clip['fps']
+        xy = ground(H, np.asarray(pixel) * scale)
+        if not np.isfinite(xy).all():
+            raise ValueError(f'Could not map ground contact at frame {frame}')
+        bounces = [bounce for bounce in bounces if abs(bounce['t'] - time) > 1.5 / clip['fps']]
+        bounces.append({'t': time, 'xy': xy.tolist(), 'method': 'reviewed ground contact', 'evidence': event})
+    return sorted(bounces, key=lambda bounce: bounce['t'])
 
 
 def build(data, review_path, clip_start=55):
@@ -100,6 +134,9 @@ def build(data, review_path, clip_start=55):
     windows = read_json(windows_path)['windows'] if windows_path.exists() else []
     last_v1_time = max((segment['end'] for segment in replay.get('ball_segments', [])), default=0)
     additional = fit_review_windows(track, aligned, replay['calibration'], windows, last_v1_time)
+    bounce_path = review_path.with_name('bounce-events.json')
+    reviewed_bounces = read_json(bounce_path)['bounces'] if bounce_path.exists() else []
+    bounces = bounce_locations(replay, clip, aligned, windows, additional, reviewed_bounces)
     v1_sampled = sum(bool(row.get('reconstruction')) for row in track)
     additional_sampled = 0
     for row in track:
@@ -109,7 +146,7 @@ def build(data, review_path, clip_start=55):
             if sample:
                 row['review_reconstruction'] = sample
                 additional_sampled += 1
-    projection_only = sum(row['ball'] is not None and not (row.get('reconstruction') or row.get('review_reconstruction')) for row in track)
+    observation_only = sum(row['ball'] is not None and not (row.get('reconstruction') or row.get('review_reconstruction')) for row in track)
 
     # Use the existing preview of these exact source frames and keep v1 fits separate.
     replay['clip']['video'] = f"/media/{clip['video']}"
@@ -118,6 +155,7 @@ def build(data, review_path, clip_start=55):
         'reviewed_additions': len(observations), 'baseline_sha256': baseline_sha,
         'additional_segments': additional,
         'rally_events': event_review,
+        'bounces': bounces,
     }
     report = {
         'review_only': True, 'inspected_frames': len(review['inspected_frames']),
@@ -125,7 +163,8 @@ def build(data, review_path, clip_start=55):
         'replay_markers': base_count + len(observations), 'frames': len(track),
         'candidate_radius_1080p': 12, 'matches_by_model': matched, 'matches_any_model': any_match,
         'original_fit_frames': v1_sampled, 'additional_fit_frames': additional_sampled,
-        'additional_flights': len(additional), 'projection_only_frames': projection_only,
+        'additional_flights': len(additional), 'observation_only_frames': observation_only,
+        'bounce_count': len(bounces),
     }
     output = review_path.parent
     replay_name = f'replay-{clip_id}.json'
@@ -143,10 +182,12 @@ def build(data, review_path, clip_start=55):
     source_link = ''
     if urlsplit(source_url).scheme in ('http', 'https'):
         source_link = f'<a href="{escape(source_url, quote=True)}" target="_blank" rel="noreferrer">Original video ↗</a>'
+    if clip_id == 'rally-55' and (data / 'match-five/index.html').exists():
+        source_link = '<a href="/media/match-five/index.html">Five-minute review ↗</a>'
     html = html.replace(original_link, source_link)
     html = html.replace('<span id="source-time">00:55.000</span>',
                         '<span>Match time <span id="source-time">00:55.000</span></span>')
-    html = html.replace('● Ball</span></div>', '● Fitted flight &nbsp; ○ Ground projection</span></div>')
+    html = html.replace('● Ball</span></div>', '● Estimated ball</span></div>')
     html = html.replace('Drag to orbit · Scroll to zoom</span></div>',
                         'Drag to orbit · Scroll to zoom</span><span id="ball-depth-note" class="stage-label" '
                         'style="top:auto; left:auto; right:12px; bottom:12px; letter-spacing:0; font-size:10px"></span></div>')

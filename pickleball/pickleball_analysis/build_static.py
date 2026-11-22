@@ -23,7 +23,7 @@ def build(data: Path, output: Path):
     html = html.replace('src="/app.js"', f'src="./app.js?v={js_version}"')
     html = html.replace('<body>', '<body data-clips-url="./clips.json" data-media-base="./media/">')
     (output / 'index.html').write_text(html)
-    for name in ('app.js', 'style.css'):
+    for name in ('app.js', 'style.css', 'reconstruction-motion.mjs', 'match-playback.mjs', 'match-overlay.mjs'):
         shutil.copy2(web / name, output / name)
     shutil.copytree(web / 'vendor', output / 'vendor', dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns('.DS_Store'))

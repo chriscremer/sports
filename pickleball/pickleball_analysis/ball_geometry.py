@@ -83,7 +83,7 @@ def sample_segment(segments,t,max_gap=.35):
             support=np.asarray(s['support_times'])
             before=support[support<=t];after=support[support>=t]
             if before.size and after.size and after[0]-before[-1]>max_gap:return None
-            if np.min(abs(support-t))>.12:return None
+            if np.min(abs(support-t))>s.get('max_support_distance_s',.12):return None
             xyz,velocity=flight(np.array(s['p0']),np.array(s['p1']),s['end']-s['start'],s['drag_per_second'],t-s['start'])
             return {'xyz':xyz.round(5).tolist(),'velocity':velocity.round(5).tolist(),'height':round(float(xyz[2]),4),
                     'kind':'estimated 3D flight','reprojection_rmse_px':s['reprojection_rmse_px']}

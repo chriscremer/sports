@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rally Lab · Opening five minutes</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/rally-timeline.css">
+  <link rel="stylesheet" href="/match-five.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three.module.js"}}</script>
+</head>
+<body data-match-url="./match.json">
+  <header>
+    <a class="brand" href="/media/match-five/index.html">◌ <b>RALLY LAB</b><span> / PICKLEBALL</span></a>
+    <a href="/media/v2-ball-review/index.html">10-second rally review ↗</a>
+  </header>
+  <main class="match-main">
+    <section id="match-overview" class="rally-timeline" aria-label="Five-minute match timeline">
+      <div class="rally-heading"><strong>Match timeline</strong><span>0:00–5:00</span></div>
+      <div class="transport match-transport">
+        <button id="play" aria-label="Play or pause">▶ Play</button>
+        <span id="clip-time">00:00 / 05:00</span>
+        <select id="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+      </div>
+      <div class="match-lanes">
+        <span>Ball in play</span><div id="rally-play-lane" class="match-rail" aria-label="Ball in play"></div>
+        <span>Analyzed</span><div id="review-lane" class="match-rail" aria-label="Analyzed"></div>
+        <span></span><div class="rally-ticks"><span>0:00</span><span>1:00</span><span>2:00</span><span>3:00</span><span>4:00</span><span>5:00</span></div>
+      </div>
+      <div id="match-rally-state" class="rally-footer"></div>
+      <div class="rally-footer">Click either lane to seek.</div>
+    </section>
+
+    <div class="match-hit-details">
+      <section class="rally-timeline match-hits-empty" aria-label="Detailed hits">
+        <div class="rally-heading"><strong>Detailed hits</strong></div>
+      </section>
+      <!-- REVIEWED_RALLIES -->
+    </div>
+    <div class="match-panels">
+    <section class="panel" aria-labelledby="video-title">
+      <div class="panel-head"><h1 id="video-title">Opening five minutes</h1><a href="https://www.youtube.com/watch?v=tdGSHF5FseE" target="_blank" rel="noreferrer">Open on YouTube ↗</a></div>
+      <div class="match-source">
+        <div id="youtube-stage" class="match-player"><div id="youtube-player"></div></div>
+        <div id="local-stage" class="match-player" hidden><video id="video" playsinline preload="metadata" controls></video></div>
+        <canvas id="match-source-overlay" width="1920" height="1080" aria-hidden="true"></canvas>
+      </div>
+      <div class="match-media-actions">
+        <label><input id="show-match-overlay" type="checkbox" checked> Reconstruction overlay</label>
+        <span id="media-status" role="status"></span>
+        <button type="button" id="use-local">Use local video</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="court-title">
+      <div class="panel-head"><h2 id="court-title">3D reconstruction</h2><span id="source-time">00:00.000</span></div>
+      <div id="scene" class="scene match-court">
+        <div class="legend"><span class="near">● Near team</span><span class="far">● Far team</span><span style="color:#e3fa68">● Estimated ball</span></div>
+        <span id="scene-note" class="scene-note"></span>
+        <span id="ball-depth-note" class="stage-label match-depth"></span>
+      </div>
+      <div class="panel-bottom">
+        <div class="camera-buttons"><button id="perspective" class="active">Perspective</button><button id="top">Top view</button><button id="side">Side view</button></div>
+        <label><input id="show-ball" type="checkbox" checked> Ball</label>
+        <label><input id="trails" type="checkbox" checked> Movement trails</label>
+      </div>
+    </section>
+    </div>
+    <div id="notice" class="notice" role="status">Loading match tracking…</div>
+    <section class="metrics" aria-label="Tracking statistics">
+      <article><p class="eyebrow">POSITION INDEX <span class="tag">HEURISTIC</span></p><div class="score"><b id="index">—</b><span>/ 100<br>near-team positioning</span></div><div class="score-track"><i id="score-bar"></i></div><p>Compares proximity to the non-volley line.</p></article>
+      <article><p class="eyebrow">PLAYERS TRACKED</p><div class="large" id="count">— <small>/ 4</small></div><p id="confidence">Detection confidence: —</p></article>
+      <article><p class="eyebrow">DISTANCE TO KITCHEN</p><div class="spacing"><span class="near">Near team <b id="near-distance">—</b></span><span class="far">Far team <b id="far-distance">—</b></span></div><p>Mean distance from the non-volley line, in metres.</p></article>
+      <article><p class="eyebrow">BALL HEIGHT</p><div class="large" id="ball-status">Unknown</div><p id="ball-detail">Loading ball track…</p></article>
+    </section>
+    <footer><span>RALLY LAB / OPENING FIVE MINUTES</span><span id="dataset-info"></span></footer>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

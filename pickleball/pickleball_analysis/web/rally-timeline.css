@@ -52,4 +52,4 @@
 .rally-mark:hover span, .rally-mark[aria-current] span { outline: 1px solid var(--white); outline-offset: 2px; }
 .rally-ticks { display: flex; justify-content: space-between; margin-top: 2px; color: var(--muted); font-size: 10px; }
 .rally-footer { margin-top: 6px; }
-#rally-phase { color: var(--white); }
+#rally-phase, [data-rally-phase] { color: var(--white); }
